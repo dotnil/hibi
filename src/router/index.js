@@ -1,23 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import TodoList from '@/views/TodoList.vue'
-import TodoItem from '@/components/TodoItem.vue'
+import TaskListView from '@/views/TaskListView.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'TodoList',
-    component: TodoList
-  },
-  {
-    path: '/:item',
-    name: 'TodoItem',
-    component: TodoItem
-  }
+  { path: '/', component: TaskListView }
 ]
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+export default createRouter({
+  history: createWebHistory(),
   routes
 })
-
-export default router

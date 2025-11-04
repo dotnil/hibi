@@ -4,14 +4,21 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [vue()],
-  server: {
-    port: 3000
-  },
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  server: {
+    port: 3000,
+  },
+  css: {
+    preprocessorOptions: {
+      sugarss: {},
+    },
   },
   test: {
     globals: true,
     environment: 'jsdom',
-  }
+  },
 })
