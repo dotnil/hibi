@@ -3,7 +3,10 @@ import TodoList from '@/views/TodoList.vue'
 import { expect, test } from 'vitest'
 
 import { Crypto } from '@peculiar/webcrypto'
-global.crypto = new Crypto()
+Object.defineProperty(globalThis, 'crypto', {
+  value: new Crypto(),
+  configurable: true
+})
 
 test('Add a new task with the save button', async () => {
   const todoList = mount(TodoList)

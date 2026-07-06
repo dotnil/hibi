@@ -1,4 +1,4 @@
-# Todo Vue
+# [todo](https://github.com/rusty-cluster/styleguide/blob/main/js/vue) [![CI](https://github.com/dotnil/todo/actions/workflows/ci.yml/badge.svg)](https://github.com/dotnil/todo/actions/workflows/ci.yml)
 
 Todo Vue — небольшое одностраничное приложение для ведения списка задач. Проект собран на Vue 3 и Vite, использует Vue Router для маршрутизации и Pinia для хранения пользовательских данных.
 
