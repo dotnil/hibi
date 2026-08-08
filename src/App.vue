@@ -1,6 +1,12 @@
 <template>
-  <router-view />
+  <main class="app">
+    <TodoList />
+  </main>
 </template>
+
+<script setup>
+import TodoList from '@/views/TodoList.vue'
+</script>
 
 <style>
 @font-face
