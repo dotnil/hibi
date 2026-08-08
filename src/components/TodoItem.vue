@@ -11,7 +11,7 @@ li.todo-item
 const emit = defineEmits(['toggleTask', 'deleteTask'])
 
 const props = defineProps({
-  todo: { type: Object, default: () => ({ name: 'task', done: false, id: '' }) },
+  todo: { type: Object, required: true },
 })
 
 function emitToggleTask() {

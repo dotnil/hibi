@@ -1,6 +1,6 @@
 <template lang='pug'>
 .todo-list__wrapper
-  input.todo-list__title(v-model="title" @keyup.enter='title')
+  input.todo-list__title(v-model="title")
 
   ul.todo-list__container
     TodoItem(
@@ -34,13 +34,9 @@ const todos = ref([
 ])
 
 function toggleTask(id) {
-  const oldTask = todos.value.find(todo => id === todo.id)
-  const updatedTask = { ...oldTask, done: !oldTask.done }
+  const todo = todos.value.find(todo => id === todo.id)
 
-  todos.value = todos.value.map(task => {
-    if(task.id === id) { return updatedTask }
-    return task
-  })
+  if (todo) { todo.done = !todo.done }
 }
 
 function deleteTask(id) {
@@ -125,4 +121,3 @@ button.todo-list__button
 button.todo-list__button:hover
   background-color: #FAF7F5
 </style>
-
