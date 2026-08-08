@@ -36,10 +36,6 @@ function emitDeleteTask() {
 }
 
 .todo-item:hover {
-  font-size: larger;
-}
-
-.todo-item:hover {
   list-style-type: disc;
 }
 
