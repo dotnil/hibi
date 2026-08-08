@@ -1,5 +1,16 @@
 <template>
   <li class="todo-item">
+    <button
+      class="todo-item__drag-handle"
+      type="button"
+      aria-label="Move task"
+      @pointerdown="startDrag"
+      @pointermove="moveDrag"
+      @pointerup="endDrag"
+      @pointercancel="cancelDrag"
+    >
+      ⋮⋮
+    </button>
     <span
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
@@ -13,7 +24,14 @@
 </template>
 
 <script setup>
-const emit = defineEmits(['toggleTask', 'deleteTask'])
+const emit = defineEmits([
+  'toggleTask',
+  'deleteTask',
+  'dragStart',
+  'dragMove',
+  'dragEnd',
+  'dragCancel',
+])
 
 const props = defineProps({
   todo: { type: Object, required: true },
@@ -26,6 +44,23 @@ function emitToggleTask() {
 function emitDeleteTask() {
   emit('deleteTask', props.todo.id)
 }
+
+function startDrag(event) {
+  event.currentTarget.setPointerCapture(event.pointerId)
+  emit('dragStart', props.todo.id, event)
+}
+
+function moveDrag(event) {
+  emit('dragMove', props.todo.id, event)
+}
+
+function endDrag(event) {
+  emit('dragEnd', props.todo.id, event)
+}
+
+function cancelDrag(event) {
+  emit('dragCancel', props.todo.id, event)
+}
 </script>
 
 <style>
@@ -35,8 +70,12 @@ function emitDeleteTask() {
   height: 40px;
 }
 
-.todo-item:hover {
-  list-style-type: disc;
+.todo-item__drag-handle {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: grab;
+  touch-action: none;
 }
 
 .todo-item__name {

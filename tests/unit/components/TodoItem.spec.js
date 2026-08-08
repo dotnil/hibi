@@ -1,6 +1,12 @@
 import { mount } from '@vue/test-utils'
 import TodoItem from '@/components/TodoItem.vue'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
+
+const todo = { id: '1', name: 'buy milk', done: false }
+
+function mountTodoItem() {
+  return mount(TodoItem, { props: { todo } })
+}
 
 test('Render value', () => {
   const wrapper = mount(
@@ -11,10 +17,44 @@ test('Render value', () => {
 })
 
 test('Emit @toggleTask', async () => {
-  const todo = { id: '1', name: 'buy milk', done: false }
-  const todoItem = mount(TodoItem, { props: { todo } })
+  const todoItem = mountTodoItem()
 
   await todoItem.find('.todo-item__name').trigger('click')
 
   expect(todoItem.emitted('toggleTask')).toEqual([[todo.id]])
+})
+
+test('Capture the pointer and emit @dragStart from the drag handle', async () => {
+  const todoItem = mountTodoItem()
+  const dragHandle = todoItem.find('.todo-item__drag-handle')
+  const setPointerCapture = vi.fn()
+
+  dragHandle.element.setPointerCapture = setPointerCapture
+  await dragHandle.trigger('pointerdown', { pointerId: 7 })
+
+  expect(setPointerCapture).toHaveBeenCalledWith(7)
+  expect(todoItem.emitted('dragStart')[0][0]).toBe(todo.id)
+  expect(todoItem.emitted('dragStart')[0][1]).toBeInstanceOf(Event)
+})
+
+test.each([
+  ['pointermove', 'dragMove'],
+  ['pointerup', 'dragEnd'],
+  ['pointercancel', 'dragCancel'],
+])('Emit @%s interaction as @%s', async (pointerEvent, componentEvent) => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__drag-handle').trigger(pointerEvent, { pointerId: 7 })
+
+  expect(todoItem.emitted(componentEvent)[0][0]).toBe(todo.id)
+  expect(todoItem.emitted(componentEvent)[0][1]).toBeInstanceOf(Event)
+})
+
+test('Do not start drag from task controls', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__name').trigger('pointerdown')
+  await todoItem.find('.todo-item__delete').trigger('pointerdown')
+
+  expect(todoItem.emitted('dragStart')).toBeUndefined()
 })
