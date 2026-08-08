@@ -1,6 +1,10 @@
 {
   description = "todo-vue";
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
   outputs = {
     self,
@@ -9,29 +13,28 @@
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
+      nodejs = pkgs.nodejs_24;
     in {
-      devShell = pkgs.mkShell {
-        buildInputs = [
-          pkgs.nodejs_20
+      devShells.default = pkgs.mkShell {
+        packages = [
+          nodejs
         ];
       };
 
       packages.default = pkgs.buildNpmPackage {
-        name = "todo-vue";
-
-        buildInputs = with pkgs; [
-          nodejs_20
-        ];
+        pname = "todo-vue";
+        version = "0.0.0";
 
         src = self;
+        inherit nodejs;
 
-        npmDepsHash = "sha256-6UKjSPcOaqOKQtJm/eEOfTR22bAiIUSRZSeTaHrwMzw=";
-
-        npmBuild = "npm run build";
+        npmDepsHash = "sha256-ge1pNtmZhySvUmN1EXYsHfkoacMYVCVXhDlZAKxT5NU=";
 
         installPhase = ''
-          mkdir $out
-          cp -r dist/* $out/
+          runHook preInstall
+          mkdir -p "$out"
+          cp -r dist/. "$out/"
+          runHook postInstall
         '';
       };
     });
