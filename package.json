@@ -7,7 +7,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint --fix src",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint --fix src tests",
     "test": "vitest run",
     "coverage": "vitest run --coverage"
   },
