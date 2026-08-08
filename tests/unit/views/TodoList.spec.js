@@ -2,9 +2,6 @@ import { mount } from '@vue/test-utils'
 import TodoList from '@/views/TodoList.vue'
 import { expect, test } from 'vitest'
 
-import { Crypto } from '@peculiar/webcrypto'
-global.crypto = new Crypto()
-
 test('Add a new task with the save button', async () => {
   const todoList = mount(TodoList)
 

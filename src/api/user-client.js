@@ -5,7 +5,7 @@ export default {
     try {
       const response = await fetch(`${back}/user`, {
         method: 'GET',
-        header: {
+        headers: {
           'Content-Type': 'application/json'
         },
         credentials: 'include'

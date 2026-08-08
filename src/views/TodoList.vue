@@ -123,6 +123,6 @@ button.todo-list__button
   align-items: center
 
 button.todo-list__button:hover
-background-color: #FAF7F5
+  background-color: #FAF7F5
 </style>
 
