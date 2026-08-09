@@ -12,6 +12,10 @@
         :todo="todo"
         @toggle-task="toggleTask"
         @delete-task="deleteTask"
+        @drag-start="startDrag"
+        @drag-move="moveDrag"
+        @drag-end="endDrag"
+        @drag-cancel="cancelDrag"
       />
     </ul>
     <div class="todo-list__call-to-action">
@@ -42,6 +46,39 @@ const todos = ref([
   { name: 'function', done: false, id: crypto.randomUUID() },
   { name: 'take a rest', done: false, id: crypto.randomUUID() }
 ])
+
+const dragSession = ref(null)
+
+function isActivePointer(pointerId) {
+  return dragSession.value?.pointerId === pointerId
+}
+
+function startDrag(todoId, event) {
+  if (dragSession.value) { return }
+
+  dragSession.value = {
+    todoId,
+    pointerId: event.pointerId,
+  }
+}
+
+function moveDrag(todoId, event) {
+  return isActivePointer(event.pointerId)
+}
+
+function finishDrag(event) {
+  if (!isActivePointer(event.pointerId)) { return }
+
+  dragSession.value = null
+}
+
+function endDrag(todoId, event) {
+  finishDrag(event)
+}
+
+function cancelDrag(todoId, event) {
+  finishDrag(event)
+}
 
 function toggleTask(id) {
   const todo = todos.value.find(todo => id === todo.id)
