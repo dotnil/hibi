@@ -1,6 +1,14 @@
 <template>
-  <li class="todo-item">
+  <li
+    class="todo-item"
+    :class="{
+      'todo-item_placeholder': placeholder,
+      'todo-item_overlay': overlay,
+    }"
+    :aria-hidden="overlay || undefined"
+  >
     <button
+      v-if="!overlay"
       class="todo-item__drag-handle"
       type="button"
       aria-label="Move task"
@@ -17,6 +25,7 @@
       @click="emitToggleTask"
     >{{ todo.name }}</span>
     <div
+      v-if="!overlay"
       class="todo-item__delete"
       @click="emitDeleteTask"
     />
@@ -35,6 +44,8 @@ const emit = defineEmits([
 
 const props = defineProps({
   todo: { type: Object, required: true },
+  placeholder: { type: Boolean, default: false },
+  overlay: { type: Boolean, default: false },
 })
 
 function emitToggleTask() {
@@ -76,6 +87,19 @@ function cancelDrag(event) {
   color: inherit;
   cursor: grab;
   touch-action: none;
+}
+
+.todo-item_placeholder {
+  visibility: hidden;
+}
+
+.todo-item_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 .todo-item__name {

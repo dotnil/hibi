@@ -10,6 +10,7 @@
         v-for="todo in todos"
         :key="todo.id"
         :todo="todo"
+        :placeholder="dragSession?.todoId === todo.id"
         @toggle-task="toggleTask"
         @delete-task="deleteTask"
         @drag-start="startDrag"
@@ -18,6 +19,12 @@
         @drag-cancel="cancelDrag"
       />
     </ul>
+    <TodoItem
+      v-if="activeTodo"
+      :todo="activeTodo"
+      :style="dragOverlayStyle"
+      overlay
+    />
     <div class="todo-list__call-to-action">
       <input
         v-model.trim="taskName"
@@ -35,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import TodoItem from '@/components/TodoItem.vue'
 
 const taskName = ref('')
@@ -49,6 +56,20 @@ const todos = ref([
 
 const dragSession = ref(null)
 
+const activeTodo = computed(() => {
+  return todos.value.find(todo => todo.id === dragSession.value?.todoId)
+})
+
+const dragOverlayStyle = computed(() => {
+  if (!dragSession.value) { return }
+
+  return {
+    width: `${dragSession.value.width}px`,
+    height: `${dragSession.value.height}px`,
+    transform: `translate3d(${dragSession.value.left}px, ${dragSession.value.top}px, 0)`,
+  }
+})
+
 function isActivePointer(pointerId) {
   return dragSession.value?.pointerId === pointerId
 }
@@ -56,14 +77,25 @@ function isActivePointer(pointerId) {
 function startDrag(todoId, event) {
   if (dragSession.value) { return }
 
+  const cardRect = event.currentTarget.closest('.todo-item').getBoundingClientRect()
+
   dragSession.value = {
     todoId,
     pointerId: event.pointerId,
+    pointerOffsetX: event.clientX - cardRect.left,
+    pointerOffsetY: event.clientY - cardRect.top,
+    left: cardRect.left,
+    top: cardRect.top,
+    width: cardRect.width,
+    height: cardRect.height,
   }
 }
 
 function moveDrag(todoId, event) {
-  return isActivePointer(event.pointerId)
+  if (!isActivePointer(event.pointerId)) { return }
+
+  dragSession.value.left = event.clientX - dragSession.value.pointerOffsetX
+  dragSession.value.top = event.clientY - dragSession.value.pointerOffsetY
 }
 
 function finishDrag(event) {
