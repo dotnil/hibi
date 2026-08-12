@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { useTemplateRef } from 'vue'
 
 const emit = defineEmits([
   'toggleTask',
@@ -43,7 +43,6 @@ const emit = defineEmits([
   'dragMove',
   'dragEnd',
   'dragCancel',
-  'elementReady',
 ])
 
 const props = defineProps({
@@ -53,9 +52,6 @@ const props = defineProps({
 })
 
 const element = useTemplateRef('element')
-
-onMounted(() => emit('elementReady', props.todo.id, element.value))
-onBeforeUnmount(() => emit('elementReady', props.todo.id, null))
 
 function emitToggleTask() {
   emit('toggleTask', props.todo.id)
@@ -67,7 +63,7 @@ function emitDeleteTask() {
 
 function startDrag(event) {
   event.currentTarget.setPointerCapture(event.pointerId)
-  emit('dragStart', props.todo.id, event)
+  emit('dragStart', props.todo.id, event, element.value.getBoundingClientRect())
 }
 
 function moveDrag(event) {

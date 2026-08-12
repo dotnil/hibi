@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import TodoItem from '@/components/TodoItem.vue'
 import TodoList from '@/views/TodoList.vue'
-import { expect, test, vi } from 'vitest'
+import { expect, test } from 'vitest'
 
 function createPointerEvent(pointerId, clientX = 0, clientY = 0) {
   const event = new Event('pointermove')
@@ -15,16 +15,15 @@ function createPointerEvent(pointerId, clientX = 0, clientY = 0) {
 
 function startDrag(todoList, pointerId = 7, clientX = 30, clientY = 50) {
   const todoItem = todoList.findComponent(TodoItem)
-  const card = todoItem.element
   const event = createPointerEvent(pointerId, clientX, clientY)
-
-  vi.spyOn(card, 'getBoundingClientRect').mockReturnValue({
+  const cardRect = {
     left: 10,
     top: 20,
     width: 300,
     height: 40,
-  })
-  todoItem.vm.$emit('dragStart', todoItem.props('todo').id, event)
+  }
+
+  todoItem.vm.$emit('dragStart', todoItem.props('todo').id, event, cardRect)
 
   return todoItem
 }
@@ -102,7 +101,12 @@ test('Do not replace an active drag session', () => {
   const todoList = mount(TodoList)
   const todoItems = todoList.findAllComponents(TodoItem)
   startDrag(todoList)
-  todoItems[1].vm.$emit('dragStart', todoItems[1].props('todo').id, createPointerEvent(8))
+  todoItems[1].vm.$emit(
+    'dragStart',
+    todoItems[1].props('todo').id,
+    createPointerEvent(8),
+    { left: 0, top: 0, width: 100, height: 40 }
+  )
 
   expect(todoList.vm.dragSession.todoId).toBe(todoItems[0].props('todo').id)
   expect(todoList.vm.dragSession.pointerId).toBe(7)
