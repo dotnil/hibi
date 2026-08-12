@@ -17,6 +17,7 @@
         @drag-move="moveDrag"
         @drag-end="endDrag"
         @drag-cancel="cancelDrag"
+        @element-ready="registerTodoElement"
       />
     </ul>
     <TodoItem
@@ -55,6 +56,7 @@ const todos = ref([
 ])
 
 const dragSession = ref(null)
+const todoElements = new Map()
 
 const activeTodo = computed(() => {
   return todos.value.find(todo => todo.id === dragSession.value?.todoId)
@@ -74,10 +76,18 @@ function isActivePointer(pointerId) {
   return dragSession.value?.pointerId === pointerId
 }
 
+function registerTodoElement(todoId, element) {
+  if (element) {
+    todoElements.set(todoId, element)
+  } else {
+    todoElements.delete(todoId)
+  }
+}
+
 function startDrag(todoId, event) {
   if (dragSession.value) { return }
 
-  const cardRect = event.currentTarget.closest('.todo-item').getBoundingClientRect()
+  const cardRect = todoElements.get(todoId).getBoundingClientRect()
 
   dragSession.value = {
     todoId,

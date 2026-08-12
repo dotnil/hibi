@@ -1,5 +1,6 @@
 <template>
   <li
+    ref="element"
     class="todo-item"
     :class="{
       'todo-item_placeholder': placeholder,
@@ -33,6 +34,8 @@
 </template>
 
 <script setup>
+import { onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+
 const emit = defineEmits([
   'toggleTask',
   'deleteTask',
@@ -40,6 +43,7 @@ const emit = defineEmits([
   'dragMove',
   'dragEnd',
   'dragCancel',
+  'elementReady',
 ])
 
 const props = defineProps({
@@ -47,6 +51,11 @@ const props = defineProps({
   placeholder: { type: Boolean, default: false },
   overlay: { type: Boolean, default: false },
 })
+
+const element = useTemplateRef('element')
+
+onMounted(() => emit('elementReady', props.todo.id, element.value))
+onBeforeUnmount(() => emit('elementReady', props.todo.id, null))
 
 function emitToggleTask() {
   emit('toggleTask', props.todo.id)

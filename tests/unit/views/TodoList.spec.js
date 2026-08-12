@@ -16,7 +16,6 @@ function createPointerEvent(pointerId, clientX = 0, clientY = 0) {
 function startDrag(todoList, pointerId = 7, clientX = 30, clientY = 50) {
   const todoItem = todoList.findComponent(TodoItem)
   const card = todoItem.element
-  const handle = todoItem.find('.todo-item__drag-handle').element
   const event = createPointerEvent(pointerId, clientX, clientY)
 
   vi.spyOn(card, 'getBoundingClientRect').mockReturnValue({
@@ -25,7 +24,6 @@ function startDrag(todoList, pointerId = 7, clientX = 30, clientY = 50) {
     width: 300,
     height: 40,
   })
-  Object.defineProperty(event, 'currentTarget', { value: handle })
   todoItem.vm.$emit('dragStart', todoItem.props('todo').id, event)
 
   return todoItem
