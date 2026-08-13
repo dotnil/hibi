@@ -18,14 +18,19 @@
       ⋮⋮
     </button>
     <span
+      v-else
+      class="todo-item__drag-handle"
+    >
+      ⋮⋮
+    </span>
+    <span
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
-      @click="emitToggleTask"
+      @click="!overlay && emitToggleTask()"
     >{{ todo.name }}</span>
     <div
-      v-if="!overlay"
       class="todo-item__delete"
-      @click="emitDeleteTask"
+      @click="!overlay && emitDeleteTask()"
     />
   </li>
 </template>

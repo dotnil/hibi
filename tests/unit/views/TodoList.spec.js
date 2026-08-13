@@ -144,8 +144,9 @@ test('Show an overlay at the card position and keep the original as placeholder'
   expect(overlay.attributes('style')).toContain('translate3d(10px, 20px, 0)')
   expect(overlay.attributes('style')).toContain('width: 300px')
   expect(overlay.attributes('aria-hidden')).toBe('true')
-  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(false)
-  expect(overlay.find('.todo-item__delete').exists()).toBe(false)
+  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(true)
+  expect(overlay.find('.todo-item__delete').exists()).toBe(true)
+  expect(overlay.find('button').exists()).toBe(false)
   expect(todoItem.classes()).toContain('todo-item_placeholder')
 })
 

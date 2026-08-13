@@ -58,3 +58,19 @@ test('Do not start drag from task controls', async () => {
 
   expect(todoItem.emitted('dragStart')).toBeUndefined()
 })
+
+test('Keep the card structure without controls in overlay mode', async () => {
+  const todoItem = mount(TodoItem, { props: { todo, overlay: true } })
+
+  expect(todoItem.attributes('aria-hidden')).toBe('true')
+  expect(todoItem.find('.todo-item__drag-handle').element.tagName).toBe('SPAN')
+  expect(todoItem.find('.todo-item__delete').exists()).toBe(true)
+  expect(todoItem.find('button').exists()).toBe(false)
+
+  await todoItem.find('.todo-item__name').trigger('click')
+  await todoItem.find('.todo-item__delete').trigger('click')
+
+  expect(todoItem.emitted('toggleTask')).toBeUndefined()
+  expect(todoItem.emitted('deleteTask')).toBeUndefined()
+  expect(todoItem.emitted('dragStart')).toBeUndefined()
+})
