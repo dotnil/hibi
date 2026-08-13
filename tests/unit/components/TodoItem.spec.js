@@ -24,33 +24,30 @@ test('Emit @toggleTask', async () => {
   expect(todoItem.emitted('toggleTask')).toEqual([[todo.id]])
 })
 
-test('Capture the pointer and emit @dragStart from the drag handle', async () => {
+test('Emit @dragStart with card geometry from the drag handle', async () => {
   const todoItem = mountTodoItem()
   const dragHandle = todoItem.find('.todo-item__drag-handle')
-  const setPointerCapture = vi.fn()
   const cardRect = { left: 10, top: 20, width: 300, height: 40 }
 
-  dragHandle.element.setPointerCapture = setPointerCapture
   vi.spyOn(todoItem.element, 'getBoundingClientRect').mockReturnValue(cardRect)
   await dragHandle.trigger('pointerdown', { pointerId: 7 })
 
-  expect(setPointerCapture).toHaveBeenCalledWith(7)
   expect(todoItem.emitted('dragStart')[0][0]).toBe(todo.id)
   expect(todoItem.emitted('dragStart')[0][1]).toBeInstanceOf(Event)
   expect(todoItem.emitted('dragStart')[0][2]).toBe(cardRect)
 })
 
-test.each([
-  ['pointermove', 'dragMove'],
-  ['pointerup', 'dragEnd'],
-  ['pointercancel', 'dragCancel'],
-])('Emit @%s interaction as @%s', async (pointerEvent, componentEvent) => {
+test('Do not emit drag lifecycle events after drag start', async () => {
   const todoItem = mountTodoItem()
+  const dragHandle = todoItem.find('.todo-item__drag-handle')
 
-  await todoItem.find('.todo-item__drag-handle').trigger(pointerEvent, { pointerId: 7 })
+  await dragHandle.trigger('pointermove', { pointerId: 7 })
+  await dragHandle.trigger('pointerup', { pointerId: 7 })
+  await dragHandle.trigger('pointercancel', { pointerId: 7 })
 
-  expect(todoItem.emitted(componentEvent)[0][0]).toBe(todo.id)
-  expect(todoItem.emitted(componentEvent)[0][1]).toBeInstanceOf(Event)
+  expect(todoItem.emitted('dragMove')).toBeUndefined()
+  expect(todoItem.emitted('dragEnd')).toBeUndefined()
+  expect(todoItem.emitted('dragCancel')).toBeUndefined()
 })
 
 test('Do not start drag from task controls', async () => {

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import TodoItem from '@/components/TodoItem.vue'
 import TodoList from '@/views/TodoList.vue'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 function createPointerEvent(pointerId, clientX = 0, clientY = 0) {
   const event = new Event('pointermove')
@@ -30,6 +30,7 @@ async function addTask(todoList, name) {
 
 function startDrag(todoList, index = 0, pointerId = 7, clientX = 30, clientY = 50) {
   const todoItem = getTodoItems(todoList)[index]
+  const dragContainer = todoList.find('.todo-list__container').element
   const event = createPointerEvent(pointerId, clientX, clientY)
   const cardRect = {
     left: 10,
@@ -38,6 +39,7 @@ function startDrag(todoList, index = 0, pointerId = 7, clientX = 30, clientY = 5
     height: 40,
   }
 
+  dragContainer.setPointerCapture ??= vi.fn()
   todoItem.vm.$emit('dragStart', todoItem.props('todo').id, event, cardRect)
 
   return todoItem
@@ -98,8 +100,11 @@ test('Delete the task', async () => {
 
 test('Start one drag session with todo and pointer identity', () => {
   const todoList = mount(TodoList)
+  const dragContainer = todoList.find('.todo-list__container').element
+  dragContainer.setPointerCapture = vi.fn()
   const todoItem = startDrag(todoList)
 
+  expect(dragContainer.setPointerCapture).toHaveBeenCalledWith(7)
   expect(todoList.vm.dragSession).toEqual({
     todoId: todoItem.props('todo').id,
     pointerId: 7,
@@ -146,10 +151,13 @@ test('Show an overlay at the card position and keep the original as placeholder'
 
 test('Move the overlay with the active pointer while preserving the grab point', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList)
-  const todoId = todoItem.props('todo').id
+  startDrag(todoList)
 
-  todoItem.vm.$emit('dragMove', todoId, createPointerEvent(7, 80, 100))
+  await todoList.find('.todo-list__container').trigger('pointermove', {
+    pointerId: 7,
+    clientX: 80,
+    clientY: 100,
+  })
   await todoList.vm.$nextTick()
 
   expect(todoList.find('.todo-item_overlay').attributes('style'))
@@ -158,9 +166,13 @@ test('Move the overlay with the active pointer while preserving the grab point',
 
 test('Move a todo down to the next position during drag', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList)
+  startDrag(todoList)
 
-  todoItem.vm.$emit('dragMove', todoItem.props('todo').id, createPointerEvent(7, 30, 111))
+  await todoList.find('.todo-list__container').trigger('pointermove', {
+    pointerId: 7,
+    clientX: 30,
+    clientY: 111,
+  })
   await todoList.vm.$nextTick()
 
   expect(getTodoNames(todoList)).toEqual(['take a rest', 'function'])
@@ -168,9 +180,13 @@ test('Move a todo down to the next position during drag', async () => {
 
 test('Move a todo up to the previous position during drag', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList, 1, 7, 30, 90)
+  startDrag(todoList, 1, 7, 30, 90)
 
-  todoItem.vm.$emit('dragMove', todoItem.props('todo').id, createPointerEvent(7, 30, 29))
+  await todoList.find('.todo-list__container').trigger('pointermove', {
+    pointerId: 7,
+    clientX: 30,
+    clientY: 29,
+  })
   await todoList.vm.$nextTick()
 
   expect(getTodoNames(todoList)).toEqual(['take a rest', 'function'])
@@ -180,9 +196,13 @@ test('Move a todo through several positions in one pointer move', async () => {
   const todoList = mount(TodoList)
   await addTask(todoList, 'third')
   await addTask(todoList, 'fourth')
-  const todoItem = startDrag(todoList)
+  startDrag(todoList)
 
-  todoItem.vm.$emit('dragMove', todoItem.props('todo').id, createPointerEvent(7, 30, 191))
+  await todoList.find('.todo-list__container').trigger('pointermove', {
+    pointerId: 7,
+    clientX: 30,
+    clientY: 191,
+  })
   await todoList.vm.$nextTick()
 
   expect(getTodoNames(todoList)).toEqual(['take a rest', 'third', 'fourth', 'function'])
@@ -190,11 +210,11 @@ test('Move a todo through several positions in one pointer move', async () => {
 
 test('Reverse a previous live reorder after crossing the opposite boundary', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList)
-  const todoId = todoItem.props('todo').id
+  startDrag(todoList)
+  const dragContainer = todoList.find('.todo-list__container')
 
-  todoItem.vm.$emit('dragMove', todoId, createPointerEvent(7, 30, 111))
-  todoItem.vm.$emit('dragMove', todoId, createPointerEvent(7, 30, 49))
+  await dragContainer.trigger('pointermove', { pointerId: 7, clientX: 30, clientY: 111 })
+  await dragContainer.trigger('pointermove', { pointerId: 7, clientX: 30, clientY: 49 })
   await todoList.vm.$nextTick()
 
   expect(getTodoNames(todoList)).toEqual(['function', 'take a rest'])
@@ -204,9 +224,13 @@ test('Reverse a previous live reorder after crossing the opposite boundary', asy
 
 test('Do not reorder when the dragged center is exactly at the boundary', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList)
+  startDrag(todoList)
 
-  todoItem.vm.$emit('dragMove', todoItem.props('todo').id, createPointerEvent(7, 30, 90))
+  await todoList.find('.todo-list__container').trigger('pointermove', {
+    pointerId: 7,
+    clientX: 30,
+    clientY: 90,
+  })
   await todoList.vm.$nextTick()
 
   expect(getTodoNames(todoList)).toEqual(['function', 'take a rest'])
@@ -214,10 +238,13 @@ test('Do not reorder when the dragged center is exactly at the boundary', async 
 
 test('Do not move the overlay for a foreign pointer', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList)
-  const todoId = todoItem.props('todo').id
+  startDrag(todoList)
 
-  todoItem.vm.$emit('dragMove', todoId, createPointerEvent(8, 80, 100))
+  await todoList.find('.todo-list__container').trigger('pointermove', {
+    pointerId: 8,
+    clientX: 80,
+    clientY: 100,
+  })
   await todoList.vm.$nextTick()
 
   expect(todoList.find('.todo-item_overlay').attributes('style'))
@@ -227,31 +254,47 @@ test('Do not move the overlay for a foreign pointer', async () => {
 
 test('Keep the live order after drag end', async () => {
   const todoList = mount(TodoList)
-  const todoItem = startDrag(todoList)
-  const todoId = todoItem.props('todo').id
+  startDrag(todoList)
+  const dragContainer = todoList.find('.todo-list__container')
 
-  todoItem.vm.$emit('dragMove', todoId, createPointerEvent(7, 30, 111))
-  todoItem.vm.$emit('dragEnd', todoId, createPointerEvent(7))
+  await dragContainer.trigger('pointermove', { pointerId: 7, clientX: 30, clientY: 111 })
+  await dragContainer.trigger('pointerup', { pointerId: 7 })
   await todoList.vm.$nextTick()
 
   expect(getTodoNames(todoList)).toEqual(['take a rest', 'function'])
   expect(todoList.find('.todo-item_overlay').exists()).toBe(false)
 })
 
-test.each(['dragEnd', 'dragCancel'])(
+test.each(['pointerup', 'pointercancel'])(
   'Clear the session on active %s but ignore a foreign pointer',
-  async (dragEvent) => {
+  async (pointerEvent) => {
     const todoList = mount(TodoList)
-    const todoItem = todoList.findComponent(TodoItem)
-    const todoId = todoItem.props('todo').id
+    const dragContainer = todoList.find('.todo-list__container')
 
     startDrag(todoList)
-    todoItem.vm.$emit(dragEvent, todoId, createPointerEvent(8))
+    await dragContainer.trigger(pointerEvent, { pointerId: 8 })
     await todoList.vm.$nextTick()
     expect(todoList.find('.todo-item_overlay').exists()).toBe(true)
 
-    todoItem.vm.$emit(dragEvent, todoId, createPointerEvent(7))
+    await dragContainer.trigger(pointerEvent, { pointerId: 7 })
     await todoList.vm.$nextTick()
     expect(todoList.find('.todo-item_overlay').exists()).toBe(false)
   }
 )
+
+test('Ignore pointer movement dispatched by another todo handle', async () => {
+  const todoList = mount(TodoList)
+  const todoItems = getTodoItems(todoList)
+
+  startDrag(todoList)
+  await todoItems[1].find('.todo-item__drag-handle').trigger('pointermove', {
+    pointerId: 7,
+    clientX: 30,
+    clientY: 111,
+  })
+  await todoList.vm.$nextTick()
+
+  expect(getTodoNames(todoList)).toEqual(['function', 'take a rest'])
+  expect(todoList.find('.todo-item_overlay').attributes('style'))
+    .toContain('translate3d(10px, 20px, 0)')
+})

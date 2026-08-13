@@ -14,9 +14,6 @@
       type="button"
       aria-label="Move task"
       @pointerdown="startDrag"
-      @pointermove="moveDrag"
-      @pointerup="endDrag"
-      @pointercancel="cancelDrag"
     >
       ⋮⋮
     </button>
@@ -40,9 +37,6 @@ const emit = defineEmits([
   'toggleTask',
   'deleteTask',
   'dragStart',
-  'dragMove',
-  'dragEnd',
-  'dragCancel',
 ])
 
 const props = defineProps({
@@ -62,20 +56,7 @@ function emitDeleteTask() {
 }
 
 function startDrag(event) {
-  event.currentTarget.setPointerCapture(event.pointerId)
   emit('dragStart', props.todo.id, event, element.value.getBoundingClientRect())
-}
-
-function moveDrag(event) {
-  emit('dragMove', props.todo.id, event)
-}
-
-function endDrag(event) {
-  emit('dragEnd', props.todo.id, event)
-}
-
-function cancelDrag(event) {
-  emit('dragCancel', props.todo.id, event)
 }
 </script>
 

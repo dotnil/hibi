@@ -5,7 +5,13 @@
       class="todo-list__title"
     >
 
-    <ul class="todo-list__container">
+    <ul
+      ref="dragContainer"
+      class="todo-list__container"
+      @pointermove="moveDrag"
+      @pointerup="finishDrag"
+      @pointercancel="finishDrag"
+    >
       <TodoItem
         v-for="todo in todos"
         :key="todo.id"
@@ -14,9 +20,6 @@
         @toggle-task="toggleTask"
         @delete-task="deleteTask"
         @drag-start="startDrag"
-        @drag-move="moveDrag"
-        @drag-end="endDrag"
-        @drag-cancel="cancelDrag"
       />
     </ul>
     <TodoItem
@@ -42,7 +45,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import TodoItem from '@/components/TodoItem.vue'
 import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
 import { moveItem } from '@/utils/moveItem'
@@ -57,6 +60,7 @@ const todos = ref([
 ])
 
 const dragSession = ref(null)
+const dragContainer = useTemplateRef('dragContainer')
 
 const activeTodo = computed(() => {
   return todos.value.find(todo => todo.id === dragSession.value?.todoId)
@@ -81,6 +85,8 @@ function startDrag(todoId, event, cardRect) {
 
   const initialIndex = todos.value.findIndex(todo => todo.id === todoId)
 
+  dragContainer.value.setPointerCapture(event.pointerId)
+
   dragSession.value = {
     todoId,
     pointerId: event.pointerId,
@@ -94,8 +100,8 @@ function startDrag(todoId, event, cardRect) {
   }
 }
 
-function moveDrag(todoId, event) {
-  if (!isActivePointer(event.pointerId)) { return }
+function moveDrag(event) {
+  if (event.target !== event.currentTarget || !isActivePointer(event.pointerId)) { return }
 
   dragSession.value.left = event.clientX - dragSession.value.pointerOffsetX
   dragSession.value.top = event.clientY - dragSession.value.pointerOffsetY
@@ -115,17 +121,9 @@ function moveDrag(todoId, event) {
 }
 
 function finishDrag(event) {
-  if (!isActivePointer(event.pointerId)) { return }
+  if (event.target !== event.currentTarget || !isActivePointer(event.pointerId)) { return }
 
   dragSession.value = null
-}
-
-function endDrag(todoId, event) {
-  finishDrag(event)
-}
-
-function cancelDrag(todoId, event) {
-  finishDrag(event)
 }
 
 function toggleTask(id) {
