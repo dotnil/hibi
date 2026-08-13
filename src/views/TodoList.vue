@@ -12,15 +12,17 @@
       @pointerup="finishDrag"
       @pointercancel="finishDrag"
     >
-      <TodoItem
-        v-for="todo in todos"
-        :key="todo.id"
-        :todo="todo"
-        :placeholder="dragSession?.todoId === todo.id"
-        @toggle-task="toggleTask"
-        @delete-task="deleteTask"
-        @drag-start="startDrag"
-      />
+      <TransitionGroup name="todo-list">
+        <TodoItem
+          v-for="todo in todos"
+          :key="todo.id"
+          :todo="todo"
+          :placeholder="dragSession?.todoId === todo.id"
+          @toggle-task="toggleTask"
+          @delete-task="deleteTask"
+          @drag-start="startDrag"
+        />
+      </TransitionGroup>
     </ul>
     <TodoItem
       v-if="activeTodo"
@@ -188,6 +190,10 @@ function addTask() {
   padding: 30px;
   overflow: hidden;
   font-family: "Montserrat";
+}
+
+.todo-list-move {
+  transition: transform 150ms ease;
 }
 
 .todo-list__call-to-action {

@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { TransitionGroup } from 'vue'
 import TodoItem from '@/components/TodoItem.vue'
 import TodoList from '@/views/TodoList.vue'
 import { expect, test, vi } from 'vitest'
@@ -55,6 +56,17 @@ test('Add a new task with the save button', async () => {
   await saveButton.trigger('click')
 
   expect(todoList.text()).toContain('feed the cat')
+})
+
+test('Render keyed todos inside the list transition group', () => {
+  const todoList = mount(TodoList)
+  const transitionGroup = todoList.findComponent(TransitionGroup)
+
+  expect(transitionGroup.exists()).toBe(true)
+  expect(transitionGroup.props('name')).toBe('todo-list')
+  expect(todoList.find('.todo-list__container').element.tagName).toBe('UL')
+  expect(transitionGroup.findAllComponents(TodoItem)).toHaveLength(2)
+  expect(todoList.find('.todo-item_overlay').exists()).toBe(false)
 })
 
 test('Add a new task by pressing the "enter" key', async () => {
