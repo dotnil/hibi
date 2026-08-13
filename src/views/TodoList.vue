@@ -44,6 +44,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import TodoItem from '@/components/TodoItem.vue'
+import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
+import { moveItem } from '@/utils/moveItem'
 
 const taskName = ref('')
 
@@ -77,6 +79,8 @@ function isActivePointer(pointerId) {
 function startDrag(todoId, event, cardRect) {
   if (dragSession.value) { return }
 
+  const initialIndex = todos.value.findIndex(todo => todo.id === todoId)
+
   dragSession.value = {
     todoId,
     pointerId: event.pointerId,
@@ -86,6 +90,7 @@ function startDrag(todoId, event, cardRect) {
     top: cardRect.top,
     width: cardRect.width,
     height: cardRect.height,
+    slotOriginTop: cardRect.top - initialIndex * cardRect.height,
   }
 }
 
@@ -94,6 +99,19 @@ function moveDrag(todoId, event) {
 
   dragSession.value.left = event.clientX - dragSession.value.pointerOffsetX
   dragSession.value.top = event.clientY - dragSession.value.pointerOffsetY
+
+  const currentIndex = todos.value.findIndex(todo => todo.id === dragSession.value.todoId)
+  const targetIndex = getDragTargetIndex({
+    currentIndex,
+    draggedTop: dragSession.value.top,
+    slotOriginTop: dragSession.value.slotOriginTop,
+    slotStep: dragSession.value.height,
+    itemCount: todos.value.length,
+  })
+
+  if (targetIndex !== currentIndex) {
+    todos.value = moveItem(todos.value, currentIndex, targetIndex)
+  }
 }
 
 function finishDrag(event) {
