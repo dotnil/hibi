@@ -5,15 +5,31 @@
       class="todo-list__title"
     >
 
-    <ul class="todo-list__container">
-      <TodoItem
-        v-for="todo in todos"
-        :key="todo.id"
-        :todo="todo"
-        @toggle-task="toggleTask"
-        @delete-task="deleteTask"
-      />
+    <ul
+      ref="dragContainer"
+      class="todo-list__container"
+      @pointermove="moveDrag"
+      @pointerup="finishDrag"
+      @pointercancel="finishDrag"
+    >
+      <TransitionGroup name="todo-list">
+        <TodoItem
+          v-for="todo in todos"
+          :key="todo.id"
+          :todo="todo"
+          :placeholder="dragSession?.todoId === todo.id"
+          @toggle-task="toggleTask"
+          @delete-task="deleteTask"
+          @drag-start="startDrag"
+        />
+      </TransitionGroup>
     </ul>
+    <TodoItem
+      v-if="activeTodo"
+      :todo="activeTodo"
+      :style="dragOverlayStyle"
+      overlay
+    />
     <div class="todo-list__call-to-action">
       <input
         v-model.trim="taskName"
@@ -31,8 +47,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import TodoItem from '@/components/TodoItem.vue'
+import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
+import { moveItem } from '@/utils/moveItem'
 
 const taskName = ref('')
 
@@ -42,6 +60,73 @@ const todos = ref([
   { name: 'function', done: false, id: crypto.randomUUID() },
   { name: 'take a rest', done: false, id: crypto.randomUUID() }
 ])
+
+const dragSession = ref(null)
+const dragContainer = useTemplateRef('dragContainer')
+
+const activeTodo = computed(() => {
+  return todos.value.find(todo => todo.id === dragSession.value?.todoId)
+})
+
+const dragOverlayStyle = computed(() => {
+  if (!dragSession.value) { return }
+
+  return {
+    width: `${dragSession.value.width}px`,
+    height: `${dragSession.value.height}px`,
+    transform: `translate3d(${dragSession.value.left}px, ${dragSession.value.top}px, 0)`,
+  }
+})
+
+function isActivePointer(pointerId) {
+  return dragSession.value?.pointerId === pointerId
+}
+
+function startDrag(todoId, event, cardRect) {
+  if (dragSession.value) { return }
+
+  const initialIndex = todos.value.findIndex(todo => todo.id === todoId)
+
+  dragContainer.value.setPointerCapture(event.pointerId)
+
+  dragSession.value = {
+    todoId,
+    pointerId: event.pointerId,
+    pointerOffsetX: event.clientX - cardRect.left,
+    pointerOffsetY: event.clientY - cardRect.top,
+    left: cardRect.left,
+    top: cardRect.top,
+    width: cardRect.width,
+    height: cardRect.height,
+    slotOriginTop: cardRect.top - initialIndex * cardRect.height,
+  }
+}
+
+function moveDrag(event) {
+  if (event.target !== event.currentTarget || !isActivePointer(event.pointerId)) { return }
+
+  dragSession.value.left = event.clientX - dragSession.value.pointerOffsetX
+  dragSession.value.top = event.clientY - dragSession.value.pointerOffsetY
+
+  const currentIndex = todos.value.findIndex(todo => todo.id === dragSession.value.todoId)
+  const targetIndex = getDragTargetIndex({
+    currentIndex,
+    draggedTop: dragSession.value.top,
+    slotOriginTop: dragSession.value.slotOriginTop,
+    slotStep: dragSession.value.height,
+    itemCount: todos.value.length,
+  })
+
+  if (targetIndex !== currentIndex) {
+    todos.value = moveItem(todos.value, currentIndex, targetIndex)
+  }
+}
+
+function finishDrag(event) {
+  if (event.target !== event.currentTarget || !isActivePointer(event.pointerId)) { return }
+
+  dragSession.value = null
+}
 
 function toggleTask(id) {
   const todo = todos.value.find(todo => id === todo.id)
@@ -105,6 +190,10 @@ function addTask() {
   padding: 30px;
   overflow: hidden;
   font-family: "Montserrat";
+}
+
+.todo-list-move {
+  transition: transform 120ms ease;
 }
 
 .todo-list__call-to-action {

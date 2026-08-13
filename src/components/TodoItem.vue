@@ -1,23 +1,56 @@
 <template>
-  <li class="todo-item">
+  <li
+    ref="element"
+    class="todo-item"
+    :class="{
+      'todo-item_placeholder': placeholder,
+      'todo-item_overlay': overlay,
+    }"
+    :aria-hidden="overlay || undefined"
+  >
+    <button
+      v-if="!overlay"
+      class="todo-item__drag-handle"
+      type="button"
+      aria-label="Move task"
+      @pointerdown="startDrag"
+    >
+      ⋮⋮
+    </button>
+    <span
+      v-else
+      class="todo-item__drag-handle"
+    >
+      ⋮⋮
+    </span>
     <span
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
-      @click="emitToggleTask"
+      @click="!overlay && emitToggleTask()"
     >{{ todo.name }}</span>
     <div
       class="todo-item__delete"
-      @click="emitDeleteTask"
+      @click="!overlay && emitDeleteTask()"
     />
   </li>
 </template>
 
 <script setup>
-const emit = defineEmits(['toggleTask', 'deleteTask'])
+import { useTemplateRef } from 'vue'
+
+const emit = defineEmits([
+  'toggleTask',
+  'deleteTask',
+  'dragStart',
+])
 
 const props = defineProps({
   todo: { type: Object, required: true },
+  placeholder: { type: Boolean, default: false },
+  overlay: { type: Boolean, default: false },
 })
+
+const element = useTemplateRef('element')
 
 function emitToggleTask() {
   emit('toggleTask', props.todo.id)
@@ -25,6 +58,10 @@ function emitToggleTask() {
 
 function emitDeleteTask() {
   emit('deleteTask', props.todo.id)
+}
+
+function startDrag(event) {
+  emit('dragStart', props.todo.id, event, element.value.getBoundingClientRect())
 }
 </script>
 
@@ -35,8 +72,25 @@ function emitDeleteTask() {
   height: 40px;
 }
 
-.todo-item:hover {
-  list-style-type: disc;
+.todo-item__drag-handle {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: grab;
+  touch-action: none;
+}
+
+.todo-item_placeholder {
+  visibility: hidden;
+}
+
+.todo-item_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 .todo-item__name {
