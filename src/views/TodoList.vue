@@ -193,7 +193,7 @@ function addTask() {
 }
 
 .todo-list-move {
-  transition: transform 150ms ease;
+  transition: transform 120ms ease;
 }
 
 .todo-list__call-to-action {
