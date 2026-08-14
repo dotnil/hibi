@@ -5,42 +5,61 @@
     :class="{
       'todo-item_placeholder': placeholder,
       'todo-item_overlay': overlay,
+      'todo-item_draggable': !overlay && !editing,
     }"
     :aria-hidden="overlay || undefined"
+    :inert="overlay"
+    @pointerdown="startDrag"
   >
-    <button
-      v-if="!overlay"
-      class="todo-item__drag-handle"
-      type="button"
-      aria-label="Move task"
-      @pointerdown="startDrag"
+    <input
+      class="todo-item__checkbox"
+      type="checkbox"
+      :checked="todo.done"
+      :aria-label="todo.name"
+      @pointerdown.stop
+      @change="emitToggleTask"
     >
-      ⋮⋮
-    </button>
+    <input
+      v-if="editing && !overlay"
+      ref="nameInput"
+      v-model="draftName"
+      class="todo-item__name-input"
+      aria-label="Task name"
+      @pointerdown.stop
+      @blur="cancelEditing"
+      @keyup.enter="saveName"
+      @keyup.esc="cancelEditing"
+    >
     <span
       v-else
-      class="todo-item__drag-handle"
-    >
-      ⋮⋮
-    </span>
-    <span
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
-      @click="!overlay && emitToggleTask()"
     >{{ todo.name }}</span>
+    <button
+      v-if="!editing"
+      class="todo-item__edit"
+      type="button"
+      :aria-label="`Edit ${todo.name}`"
+      @pointerdown.stop
+      @click="startEditing"
+    >
+      Edit
+    </button>
     <div
       class="todo-item__delete"
+      @pointerdown.stop
       @click="!overlay && emitDeleteTask()"
     />
   </li>
 </template>
 
 <script setup>
-import { useTemplateRef } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 
 const emit = defineEmits([
   'toggleTask',
   'deleteTask',
+  'updateName',
   'dragStart',
 ])
 
@@ -51,16 +70,49 @@ const props = defineProps({
 })
 
 const element = useTemplateRef('element')
+const nameInput = useTemplateRef('nameInput')
+const editing = ref(false)
+const draftName = ref('')
 
 function emitToggleTask() {
+  if (props.overlay) { return }
+
   emit('toggleTask', props.todo.id)
 }
 
 function emitDeleteTask() {
+  if (props.overlay) { return }
+
   emit('deleteTask', props.todo.id)
 }
 
+async function startEditing() {
+  if (props.overlay) { return }
+
+  draftName.value = props.todo.name
+  editing.value = true
+  await nextTick()
+  nameInput.value.focus()
+}
+
+function saveName() {
+  if (!editing.value) { return }
+
+  const name = draftName.value.trim()
+
+  if (name.length > 0) { emit('updateName', props.todo.id, name) }
+  editing.value = false
+}
+
+function cancelEditing() {
+  if (!editing.value) { return }
+
+  editing.value = false
+}
+
 function startDrag(event) {
+  if (props.overlay || editing.value) { return }
+
   emit('dragStart', props.todo.id, event, element.value.getBoundingClientRect())
 }
 </script>
@@ -72,10 +124,7 @@ function startDrag(event) {
   height: 40px;
 }
 
-.todo-item__drag-handle {
-  border: none;
-  background: none;
-  color: inherit;
+.todo-item_draggable {
   cursor: grab;
   touch-action: none;
 }
@@ -93,13 +142,13 @@ function startDrag(event) {
   pointer-events: none;
 }
 
-.todo-item__name {
-  cursor: pointer;
-}
-
 .todo-item__name_completed {
   text-decoration: line-through;
   color: #9a8c98;
+}
+
+.todo-item__name {
+  user-select: none;
 }
 
 .todo-item__delete {

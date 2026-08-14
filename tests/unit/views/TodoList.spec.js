@@ -85,13 +85,13 @@ test('Complete the task', async () => {
   const input = todoList.find('.todo-list__new-item')
   await input.setValue('feed the cat')
   await input.trigger('keyup.enter')
-  const task = todoList
-    .findAll('.todo-item__name')
-    .filter(task => task.text() === 'feed the cat')[0]
+  const todoItem = getTodoItems(todoList)
+    .find(item => item.props('todo').name === 'feed the cat')
+  const taskName = todoItem.find('.todo-item__name')
 
-  expect(task.classes()).not.toContain('todo-item__name_completed')
-  await task.trigger('click')
-  expect(task.classes()).toContain('todo-item__name_completed')
+  expect(taskName.classes()).not.toContain('todo-item__name_completed')
+  await todoItem.find('.todo-item__checkbox').trigger('change')
+  expect(taskName.classes()).toContain('todo-item__name_completed')
 })
 
 test('Delete the task', async () => {
@@ -108,6 +108,18 @@ test('Delete the task', async () => {
   const deleteButton = task.find('.todo-item__delete')
   await deleteButton.trigger('click')
   expect(todoList.text()).not.toContain('feed the cat')
+})
+
+test('Edit the selected task name', async () => {
+  const todoList = mount(TodoList)
+  const todoItems = getTodoItems(todoList)
+
+  await todoItems[1].find('.todo-item__edit').trigger('click')
+  const input = todoItems[1].find('.todo-item__name-input')
+  await input.setValue('  take a walk  ')
+  await input.trigger('keyup.enter')
+
+  expect(getTodoNames(todoList)).toEqual(['function', 'take a walk'])
 })
 
 test('Start one drag session with todo and pointer identity', () => {
@@ -156,9 +168,14 @@ test('Show an overlay at the card position and keep the original as placeholder'
   expect(overlay.attributes('style')).toContain('translate3d(10px, 20px, 0)')
   expect(overlay.attributes('style')).toContain('width: 300px')
   expect(overlay.attributes('aria-hidden')).toBe('true')
-  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(true)
+  expect(overlay.attributes()).toHaveProperty('inert')
+  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(false)
   expect(overlay.find('.todo-item__delete').exists()).toBe(true)
-  expect(overlay.find('button').exists()).toBe(false)
+  expect(overlay.find('.todo-item__checkbox').exists()).toBe(true)
+  expect(overlay.find('.todo-item__edit').exists()).toBe(true)
+  expect(overlay.find('.todo-item__name-input').exists()).toBe(false)
+  expect(overlay.find('.todo-item__checkbox').element.tagName).toBe('INPUT')
+  expect(overlay.find('.todo-item__edit').element.tagName).toBe('BUTTON')
   expect(todoItem.classes()).toContain('todo-item_placeholder')
 })
 
@@ -295,12 +312,12 @@ test.each(['pointerup', 'pointercancel'])(
   }
 )
 
-test('Ignore pointer movement dispatched by another todo handle', async () => {
+test('Ignore pointer movement dispatched by another todo card', async () => {
   const todoList = mount(TodoList)
   const todoItems = getTodoItems(todoList)
 
   startDrag(todoList)
-  await todoItems[1].find('.todo-item__drag-handle').trigger('pointermove', {
+  await todoItems[1].trigger('pointermove', {
     pointerId: 7,
     clientX: 30,
     clientY: 111,

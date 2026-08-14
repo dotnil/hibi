@@ -20,6 +20,7 @@
           :placeholder="dragSession?.todoId === todo.id"
           @toggle-task="toggleTask"
           @delete-task="deleteTask"
+          @update-name="updateName"
           @drag-start="startDrag"
         />
       </TransitionGroup>
@@ -136,6 +137,12 @@ function toggleTask(id) {
 
 function deleteTask(id) {
   todos.value = todos.value.filter(todo => id !== todo.id)
+}
+
+function updateName(id, name) {
+  const todo = todos.value.find(todo => id === todo.id)
+
+  if (todo) { todo.name = name }
 }
 
 function addTask() {
