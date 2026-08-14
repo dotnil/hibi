@@ -31,10 +31,29 @@
       :aria-label="todo.name"
       @change="emitToggleTask"
     >
+    <input
+      v-if="editing"
+      ref="nameInput"
+      v-model="draftName"
+      class="todo-item__name-input"
+      aria-label="Task name"
+      @keyup.enter="saveName"
+      @keyup.esc="cancelEditing"
+    >
     <span
+      v-else
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
     >{{ todo.name }}</span>
+    <button
+      v-if="!overlay && !editing"
+      class="todo-item__edit"
+      type="button"
+      :aria-label="`Edit ${todo.name}`"
+      @click="startEditing"
+    >
+      Edit
+    </button>
     <div
       class="todo-item__delete"
       @click="!overlay && emitDeleteTask()"
@@ -43,11 +62,12 @@
 </template>
 
 <script setup>
-import { useTemplateRef } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 
 const emit = defineEmits([
   'toggleTask',
   'deleteTask',
+  'updateName',
   'dragStart',
 ])
 
@@ -58,6 +78,9 @@ const props = defineProps({
 })
 
 const element = useTemplateRef('element')
+const nameInput = useTemplateRef('nameInput')
+const editing = ref(false)
+const draftName = ref('')
 
 function emitToggleTask() {
   emit('toggleTask', props.todo.id)
@@ -65,6 +88,24 @@ function emitToggleTask() {
 
 function emitDeleteTask() {
   emit('deleteTask', props.todo.id)
+}
+
+async function startEditing() {
+  draftName.value = props.todo.name
+  editing.value = true
+  await nextTick()
+  nameInput.value.focus()
+}
+
+function saveName() {
+  const name = draftName.value.trim()
+
+  if (name.length > 0) { emit('updateName', props.todo.id, name) }
+  editing.value = false
+}
+
+function cancelEditing() {
+  editing.value = false
 }
 
 function startDrag(event) {

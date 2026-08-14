@@ -110,6 +110,18 @@ test('Delete the task', async () => {
   expect(todoList.text()).not.toContain('feed the cat')
 })
 
+test('Edit the selected task name', async () => {
+  const todoList = mount(TodoList)
+  const todoItems = getTodoItems(todoList)
+
+  await todoItems[1].find('.todo-item__edit').trigger('click')
+  const input = todoItems[1].find('.todo-item__name-input')
+  await input.setValue('  take a walk  ')
+  await input.trigger('keyup.enter')
+
+  expect(getTodoNames(todoList)).toEqual(['function', 'take a walk'])
+})
+
 test('Start one drag session with todo and pointer identity', () => {
   const todoList = mount(TodoList)
   const dragContainer = todoList.find('.todo-list__container').element
@@ -159,6 +171,8 @@ test('Show an overlay at the card position and keep the original as placeholder'
   expect(overlay.find('.todo-item__drag-handle').exists()).toBe(true)
   expect(overlay.find('.todo-item__delete').exists()).toBe(true)
   expect(overlay.find('.todo-item__checkbox').exists()).toBe(false)
+  expect(overlay.find('.todo-item__edit').exists()).toBe(false)
+  expect(overlay.find('.todo-item__name-input').exists()).toBe(false)
   expect(overlay.find('button').exists()).toBe(false)
   expect(todoItem.classes()).toContain('todo-item_placeholder')
 })

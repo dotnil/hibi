@@ -35,6 +35,54 @@ test('Do not emit @toggleTask from the task name', async () => {
   expect(todoItem.emitted('toggleTask')).toBeUndefined()
 })
 
+test('Edit the current name and focus the input', async () => {
+  const todoItem = mount(TodoItem, { props: { todo }, attachTo: document.body })
+
+  await todoItem.find('.todo-item__edit').trigger('click')
+  const input = todoItem.find('.todo-item__name-input')
+
+  expect(input.element.value).toBe(todo.name)
+  expect(document.activeElement).toBe(input.element)
+  expect(todoItem.find('.todo-item__name').exists()).toBe(false)
+  todoItem.unmount()
+})
+
+test('Emit @updateName with the trimmed name on enter', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__edit').trigger('click')
+  const input = todoItem.find('.todo-item__name-input')
+  await input.setValue('  get bread  ')
+  await input.trigger('keyup.enter')
+
+  expect(todoItem.emitted('updateName')).toEqual([[todo.id, 'get bread']])
+  expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+})
+
+test('Cancel editing on escape', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__edit').trigger('click')
+  const input = todoItem.find('.todo-item__name-input')
+  await input.setValue('get bread')
+  await input.trigger('keyup.esc')
+
+  expect(todoItem.emitted('updateName')).toBeUndefined()
+  expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+})
+
+test('Do not emit an empty name', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__edit').trigger('click')
+  const input = todoItem.find('.todo-item__name-input')
+  await input.setValue('   ')
+  await input.trigger('keyup.enter')
+
+  expect(todoItem.emitted('updateName')).toBeUndefined()
+  expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+})
+
 test('Emit @dragStart with card geometry from the drag handle', async () => {
   const todoItem = mountTodoItem()
   const dragHandle = todoItem.find('.todo-item__drag-handle')
@@ -66,7 +114,11 @@ test('Do not start drag from task controls', async () => {
 
   await todoItem.find('.todo-item__checkbox').trigger('pointerdown')
   await todoItem.find('.todo-item__name').trigger('pointerdown')
+  await todoItem.find('.todo-item__edit').trigger('pointerdown')
   await todoItem.find('.todo-item__delete').trigger('pointerdown')
+
+  await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.find('.todo-item__name-input').trigger('pointerdown')
 
   expect(todoItem.emitted('dragStart')).toBeUndefined()
 })
@@ -78,6 +130,8 @@ test('Keep the card structure without controls in overlay mode', async () => {
   expect(todoItem.find('.todo-item__drag-handle').element.tagName).toBe('SPAN')
   expect(todoItem.find('.todo-item__delete').exists()).toBe(true)
   expect(todoItem.find('.todo-item__checkbox').exists()).toBe(false)
+  expect(todoItem.find('.todo-item__edit').exists()).toBe(false)
+  expect(todoItem.find('.todo-item__name-input').exists()).toBe(false)
   expect(todoItem.find('button').exists()).toBe(false)
 
   await todoItem.find('.todo-item__name').trigger('click')
@@ -85,5 +139,6 @@ test('Keep the card structure without controls in overlay mode', async () => {
 
   expect(todoItem.emitted('toggleTask')).toBeUndefined()
   expect(todoItem.emitted('deleteTask')).toBeUndefined()
+  expect(todoItem.emitted('updateName')).toBeUndefined()
   expect(todoItem.emitted('dragStart')).toBeUndefined()
 })
