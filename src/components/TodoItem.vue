@@ -26,6 +26,7 @@
       class="todo-item__name-input"
       aria-label="Task name"
       @pointerdown.stop
+      @blur="cancelEditing"
       @keyup.enter="saveName"
       @keyup.esc="cancelEditing"
     >
@@ -95,6 +96,8 @@ async function startEditing() {
 }
 
 function saveName() {
+  if (!editing.value) { return }
+
   const name = draftName.value.trim()
 
   if (name.length > 0) { emit('updateName', props.todo.id, name) }
@@ -102,6 +105,8 @@ function saveName() {
 }
 
 function cancelEditing() {
+  if (!editing.value) { return }
+
   editing.value = false
 }
 

@@ -54,9 +54,23 @@ test('Emit @updateName with the trimmed name on enter', async () => {
   const input = todoItem.find('.todo-item__name-input')
   await input.setValue('  get bread  ')
   await input.trigger('keyup.enter')
+  await input.trigger('blur')
 
   expect(todoItem.emitted('updateName')).toEqual([[todo.id, 'get bread']])
   expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+})
+
+test('Cancel editing on blur', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__edit').trigger('click')
+  const input = todoItem.find('.todo-item__name-input')
+  await input.setValue('get bread')
+  await input.trigger('blur')
+
+  expect(todoItem.emitted('updateName')).toBeUndefined()
+  expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+  expect(todoItem.find('.todo-item__name-input').exists()).toBe(false)
 })
 
 test('Cancel editing on escape', async () => {
