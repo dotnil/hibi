@@ -5,38 +5,27 @@
     :class="{
       'todo-item_placeholder': placeholder,
       'todo-item_overlay': overlay,
+      'todo-item_draggable': !overlay && !editing,
     }"
     :aria-hidden="overlay || undefined"
+    :inert="overlay"
+    @pointerdown="startDrag"
   >
-    <button
-      v-if="!overlay"
-      class="todo-item__drag-handle"
-      type="button"
-      aria-label="Move task"
-      @pointerdown="startDrag"
-    >
-      ⋮⋮
-    </button>
-    <span
-      v-else
-      class="todo-item__drag-handle"
-    >
-      ⋮⋮
-    </span>
     <input
-      v-if="!overlay"
       class="todo-item__checkbox"
       type="checkbox"
       :checked="todo.done"
       :aria-label="todo.name"
+      @pointerdown.stop
       @change="emitToggleTask"
     >
     <input
-      v-if="editing"
+      v-if="editing && !overlay"
       ref="nameInput"
       v-model="draftName"
       class="todo-item__name-input"
       aria-label="Task name"
+      @pointerdown.stop
       @keyup.enter="saveName"
       @keyup.esc="cancelEditing"
     >
@@ -46,16 +35,18 @@
       :class="{ 'todo-item__name_completed': todo.done }"
     >{{ todo.name }}</span>
     <button
-      v-if="!overlay && !editing"
+      v-if="!editing"
       class="todo-item__edit"
       type="button"
       :aria-label="`Edit ${todo.name}`"
+      @pointerdown.stop
       @click="startEditing"
     >
       Edit
     </button>
     <div
       class="todo-item__delete"
+      @pointerdown.stop
       @click="!overlay && emitDeleteTask()"
     />
   </li>
@@ -83,14 +74,20 @@ const editing = ref(false)
 const draftName = ref('')
 
 function emitToggleTask() {
+  if (props.overlay) { return }
+
   emit('toggleTask', props.todo.id)
 }
 
 function emitDeleteTask() {
+  if (props.overlay) { return }
+
   emit('deleteTask', props.todo.id)
 }
 
 async function startEditing() {
+  if (props.overlay) { return }
+
   draftName.value = props.todo.name
   editing.value = true
   await nextTick()
@@ -109,6 +106,8 @@ function cancelEditing() {
 }
 
 function startDrag(event) {
+  if (props.overlay || editing.value) { return }
+
   emit('dragStart', props.todo.id, event, element.value.getBoundingClientRect())
 }
 </script>
@@ -120,10 +119,7 @@ function startDrag(event) {
   height: 40px;
 }
 
-.todo-item__drag-handle {
-  border: none;
-  background: none;
-  color: inherit;
+.todo-item_draggable {
   cursor: grab;
   touch-action: none;
 }
@@ -144,6 +140,10 @@ function startDrag(event) {
 .todo-item__name_completed {
   text-decoration: line-through;
   color: #9a8c98;
+}
+
+.todo-item__name {
+  user-select: none;
 }
 
 .todo-item__delete {

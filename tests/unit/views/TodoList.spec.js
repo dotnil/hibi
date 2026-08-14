@@ -168,12 +168,14 @@ test('Show an overlay at the card position and keep the original as placeholder'
   expect(overlay.attributes('style')).toContain('translate3d(10px, 20px, 0)')
   expect(overlay.attributes('style')).toContain('width: 300px')
   expect(overlay.attributes('aria-hidden')).toBe('true')
-  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(true)
+  expect(overlay.attributes()).toHaveProperty('inert')
+  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(false)
   expect(overlay.find('.todo-item__delete').exists()).toBe(true)
-  expect(overlay.find('.todo-item__checkbox').exists()).toBe(false)
-  expect(overlay.find('.todo-item__edit').exists()).toBe(false)
+  expect(overlay.find('.todo-item__checkbox').exists()).toBe(true)
+  expect(overlay.find('.todo-item__edit').exists()).toBe(true)
   expect(overlay.find('.todo-item__name-input').exists()).toBe(false)
-  expect(overlay.find('button').exists()).toBe(false)
+  expect(overlay.find('.todo-item__checkbox').element.tagName).toBe('INPUT')
+  expect(overlay.find('.todo-item__edit').element.tagName).toBe('BUTTON')
   expect(todoItem.classes()).toContain('todo-item_placeholder')
 })
 
@@ -310,12 +312,12 @@ test.each(['pointerup', 'pointercancel'])(
   }
 )
 
-test('Ignore pointer movement dispatched by another todo handle', async () => {
+test('Ignore pointer movement dispatched by another todo card', async () => {
   const todoList = mount(TodoList)
   const todoItems = getTodoItems(todoList)
 
   startDrag(todoList)
-  await todoItems[1].find('.todo-item__drag-handle').trigger('pointermove', {
+  await todoItems[1].trigger('pointermove', {
     pointerId: 7,
     clientX: 30,
     clientY: 111,
