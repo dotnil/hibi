@@ -8,20 +8,31 @@ function mountTodoItem() {
   return mount(TodoItem, { props: { todo } })
 }
 
-test('Render value', () => {
+test('Render value and checked state', () => {
   const wrapper = mount(
     TodoItem, { props: { todo: { id: '1', name: 'buy milk', done: true } } }
   )
 
   expect(wrapper.text()).toContain('buy milk')
+  const checkbox = wrapper.find('.todo-item__checkbox')
+  expect(checkbox.element.checked).toBe(true)
+  expect(checkbox.attributes('aria-label')).toBe('buy milk')
 })
 
-test('Emit @toggleTask', async () => {
+test('Emit @toggleTask from the checkbox', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.find('.todo-item__checkbox').trigger('change')
+
+  expect(todoItem.emitted('toggleTask')).toEqual([[todo.id]])
+})
+
+test('Do not emit @toggleTask from the task name', async () => {
   const todoItem = mountTodoItem()
 
   await todoItem.find('.todo-item__name').trigger('click')
 
-  expect(todoItem.emitted('toggleTask')).toEqual([[todo.id]])
+  expect(todoItem.emitted('toggleTask')).toBeUndefined()
 })
 
 test('Emit @dragStart with card geometry from the drag handle', async () => {
@@ -53,6 +64,7 @@ test('Do not emit drag lifecycle events after drag start', async () => {
 test('Do not start drag from task controls', async () => {
   const todoItem = mountTodoItem()
 
+  await todoItem.find('.todo-item__checkbox').trigger('pointerdown')
   await todoItem.find('.todo-item__name').trigger('pointerdown')
   await todoItem.find('.todo-item__delete').trigger('pointerdown')
 
@@ -65,6 +77,7 @@ test('Keep the card structure without controls in overlay mode', async () => {
   expect(todoItem.attributes('aria-hidden')).toBe('true')
   expect(todoItem.find('.todo-item__drag-handle').element.tagName).toBe('SPAN')
   expect(todoItem.find('.todo-item__delete').exists()).toBe(true)
+  expect(todoItem.find('.todo-item__checkbox').exists()).toBe(false)
   expect(todoItem.find('button').exists()).toBe(false)
 
   await todoItem.find('.todo-item__name').trigger('click')

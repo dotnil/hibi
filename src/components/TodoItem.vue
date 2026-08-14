@@ -23,10 +23,17 @@
     >
       ⋮⋮
     </span>
+    <input
+      v-if="!overlay"
+      class="todo-item__checkbox"
+      type="checkbox"
+      :checked="todo.done"
+      :aria-label="todo.name"
+      @change="emitToggleTask"
+    >
     <span
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
-      @click="!overlay && emitToggleTask()"
     >{{ todo.name }}</span>
     <div
       class="todo-item__delete"
@@ -91,10 +98,6 @@ function startDrag(event) {
   z-index: 1;
   box-sizing: border-box;
   pointer-events: none;
-}
-
-.todo-item__name {
-  cursor: pointer;
 }
 
 .todo-item__name_completed {

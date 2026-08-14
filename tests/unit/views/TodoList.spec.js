@@ -85,13 +85,13 @@ test('Complete the task', async () => {
   const input = todoList.find('.todo-list__new-item')
   await input.setValue('feed the cat')
   await input.trigger('keyup.enter')
-  const task = todoList
-    .findAll('.todo-item__name')
-    .filter(task => task.text() === 'feed the cat')[0]
+  const todoItem = getTodoItems(todoList)
+    .find(item => item.props('todo').name === 'feed the cat')
+  const taskName = todoItem.find('.todo-item__name')
 
-  expect(task.classes()).not.toContain('todo-item__name_completed')
-  await task.trigger('click')
-  expect(task.classes()).toContain('todo-item__name_completed')
+  expect(taskName.classes()).not.toContain('todo-item__name_completed')
+  await todoItem.find('.todo-item__checkbox').trigger('change')
+  expect(taskName.classes()).toContain('todo-item__name_completed')
 })
 
 test('Delete the task', async () => {
@@ -158,6 +158,7 @@ test('Show an overlay at the card position and keep the original as placeholder'
   expect(overlay.attributes('aria-hidden')).toBe('true')
   expect(overlay.find('.todo-item__drag-handle').exists()).toBe(true)
   expect(overlay.find('.todo-item__delete').exists()).toBe(true)
+  expect(overlay.find('.todo-item__checkbox').exists()).toBe(false)
   expect(overlay.find('button').exists()).toBe(false)
   expect(todoItem.classes()).toContain('todo-item_placeholder')
 })
