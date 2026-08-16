@@ -10,6 +10,7 @@ function mountTodoItem() {
 
 async function openActions(todoItem) {
   await todoItem.find('[aria-label="Todo actions"]').trigger('click')
+  await todoItem.setProps({ actionsOpen: true })
 }
 
 test('Render value and checked state', () => {
@@ -46,7 +47,7 @@ test('Edit the current name and focus the input', async () => {
   await todoItem.find('.todo-item__edit').trigger('click')
   const input = todoItem.find('.todo-item__name-input')
 
-  expect(todoItem.find('.todo-item__actions-panel').exists()).toBe(false)
+  expect(todoItem.emitted('closeActions')).toHaveLength(1)
   expect(input.element.value).toBe(todo.name)
   expect(document.activeElement).toBe(input.element)
   expect(todoItem.find('.todo-item__name').exists()).toBe(false)
@@ -58,6 +59,7 @@ test('Emit @updateName with the trimmed name on enter', async () => {
 
   await openActions(todoItem)
   await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
   const input = todoItem.find('.todo-item__name-input')
   await input.setValue('  get bread  ')
   await input.trigger('keyup.enter')
@@ -72,6 +74,7 @@ test('Cancel editing on blur', async () => {
 
   await openActions(todoItem)
   await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
   const input = todoItem.find('.todo-item__name-input')
   await input.setValue('get bread')
   await input.trigger('blur')
@@ -86,6 +89,7 @@ test('Cancel editing on escape', async () => {
 
   await openActions(todoItem)
   await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
   const input = todoItem.find('.todo-item__name-input')
   await input.setValue('get bread')
   await input.trigger('keyup.esc')
@@ -99,6 +103,7 @@ test('Do not emit an empty name', async () => {
 
   await openActions(todoItem)
   await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
   const input = todoItem.find('.todo-item__name-input')
   await input.setValue('   ')
   await input.trigger('keyup.enter')
@@ -141,6 +146,7 @@ test('Do not start drag from task controls', async () => {
   await todoItem.find('.todo-item__delete').trigger('pointerdown')
 
   await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
   await todoItem.find('.todo-item__name-input').trigger('pointerdown')
 
   expect(todoItem.emitted('dragStart')).toBeUndefined()
@@ -151,6 +157,7 @@ test('Disable card drag while editing and restore it after cancel', async () => 
 
   await openActions(todoItem)
   await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
   await todoItem.trigger('pointerdown', { pointerId: 7 })
   expect(todoItem.emitted('dragStart')).toBeUndefined()
 
@@ -158,29 +165,48 @@ test('Disable card drag while editing and restore it after cancel', async () => 
   expect(todoItem.find('.todo-item__edit').exists()).toBe(false)
   expect(todoItem.find('.todo-item__delete').exists()).toBe(true)
   await todoItem.find('[aria-label="Todo actions"]').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
 
   await todoItem.find('.todo-item__name-input').trigger('keyup.esc')
   await todoItem.trigger('pointerdown', { pointerId: 7 })
   expect(todoItem.emitted('dragStart')).toHaveLength(1)
 })
 
-test('Toggle the todo actions panel', async () => {
+test('Emit @toggleActions from the todo actions button', async () => {
   const todoItem = mountTodoItem()
   const toggle = todoItem.find('[aria-label="Todo actions"]')
 
   expect(toggle.attributes('aria-expanded')).toBe('false')
   await toggle.trigger('click')
-  expect(toggle.attributes('aria-expanded')).toBe('true')
-  expect(todoItem.find('.todo-item__actions-panel').exists()).toBe(true)
+  expect(todoItem.emitted('toggleActions')).toEqual([[todo.id]])
+})
 
-  await toggle.trigger('click')
-  expect(toggle.attributes('aria-expanded')).toBe('false')
-  expect(todoItem.find('.todo-item__actions-panel').exists()).toBe(false)
+test('Emit @closeActions before @deleteTask', async () => {
+  const closeActions = vi.fn()
+  const deleteTask = vi.fn()
+  const todoItem = mount(TodoItem, {
+    props: {
+      todo,
+      actionsOpen: true,
+      onCloseActions: closeActions,
+      onDeleteTask: deleteTask,
+    }
+  })
+
+  await todoItem.find('.todo-item__delete').trigger('click')
+
+  expect(closeActions).toHaveBeenCalledOnce()
+  expect(deleteTask).toHaveBeenCalledWith(todo.id)
+  expect(closeActions.mock.invocationCallOrder[0])
+    .toBeLessThan(deleteTask.mock.invocationCallOrder[0])
 })
 
 test('Keep the non-interactive card structure in overlay mode', async () => {
   const regularItem = mountTodoItem()
   const todoItem = mount(TodoItem, { props: { todo, overlay: true } })
+  const placeholderItem = mount(TodoItem, {
+    props: { todo, placeholder: true, actionsOpen: true }
+  })
   const structuralClasses = [
     '.todo-item__checkbox',
     '.todo-item__name',
@@ -202,6 +228,10 @@ test('Keep the non-interactive card structure in overlay mode', async () => {
   expect(todoItem.find('[aria-label="Todo actions"]').exists()).toBe(false)
   expect(todoItem.find('.todo-item__actions-toggle').element.tagName).toBe('SPAN')
   expect(todoItem.find('.todo-item__actions-panel').exists()).toBe(false)
+  expect(placeholderItem.attributes()).toHaveProperty('inert')
+  expect(placeholderItem.find('[aria-label="Todo actions"]').exists()).toBe(false)
+  expect(placeholderItem.find('.todo-item__actions-toggle').element.tagName).toBe('SPAN')
+  expect(placeholderItem.find('.todo-item__actions-panel').exists()).toBe(false)
 
   await todoItem.trigger('pointerdown', { pointerId: 7 })
   await todoItem.find('.todo-item__checkbox').trigger('change')
@@ -213,4 +243,6 @@ test('Keep the non-interactive card structure in overlay mode', async () => {
   expect(todoItem.emitted('deleteTask')).toBeUndefined()
   expect(todoItem.emitted('updateName')).toBeUndefined()
   expect(todoItem.emitted('dragStart')).toBeUndefined()
+  expect(placeholderItem.emitted('toggleActions')).toBeUndefined()
+  expect(placeholderItem.emitted('closeActions')).toBeUndefined()
 })

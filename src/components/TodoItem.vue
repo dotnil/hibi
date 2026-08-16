@@ -8,7 +8,7 @@
       'todo-item_draggable': !overlay && !editing,
     }"
     :aria-hidden="overlay || placeholder || undefined"
-    :inert="overlay"
+    :inert="overlay || placeholder"
     @pointerdown="startDrag"
   >
     <input
@@ -40,13 +40,13 @@
       @pointerdown.stop
     >
       <button
-        v-if="!overlay"
+        v-if="!overlay && !placeholder"
         class="todo-item__actions-toggle"
         type="button"
         aria-label="Todo actions"
         :aria-expanded="actionsOpen"
         :aria-controls="actionsId"
-        @click="actionsOpen = !actionsOpen"
+        @click="emitToggleActions"
       >
         …
       </button>
@@ -57,7 +57,7 @@
         …
       </span>
       <div
-        v-if="!overlay && actionsOpen"
+        v-if="!overlay && !placeholder && actionsOpen"
         :id="actionsId"
         class="todo-item__actions-panel"
       >
@@ -88,6 +88,8 @@ const emit = defineEmits([
   'toggleTask',
   'deleteTask',
   'updateName',
+  'toggleActions',
+  'closeActions',
   'dragStart',
 ])
 
@@ -95,13 +97,13 @@ const props = defineProps({
   todo: { type: Object, required: true },
   placeholder: { type: Boolean, default: false },
   overlay: { type: Boolean, default: false },
+  actionsOpen: { type: Boolean, default: false },
 })
 
 const element = useTemplateRef('element')
 const nameInput = useTemplateRef('nameInput')
 const editing = ref(false)
 const draftName = ref('')
-const actionsOpen = ref(false)
 const actionsId = `todo-actions-${props.todo.id}`
 
 function emitToggleTask() {
@@ -113,14 +115,20 @@ function emitToggleTask() {
 function emitDeleteTask() {
   if (props.overlay) { return }
 
-  actionsOpen.value = false
+  emit('closeActions')
   emit('deleteTask', props.todo.id)
+}
+
+function emitToggleActions() {
+  if (props.overlay || props.placeholder) { return }
+
+  emit('toggleActions', props.todo.id)
 }
 
 async function startEditing() {
   if (props.overlay) { return }
 
-  actionsOpen.value = false
+  emit('closeActions')
   draftName.value = props.todo.name
   editing.value = true
   await nextTick()

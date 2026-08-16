@@ -126,6 +126,23 @@ test('Edit the selected task name', async () => {
   expect(getTodoNames(todoList)).toEqual(['function', 'take a walk'])
 })
 
+test('Keep one actions menu open and close it outside', async () => {
+  const todoList = mount(TodoList, { attachTo: document.body })
+  const todoItems = getTodoItems(todoList)
+
+  await todoItems[0].find('[aria-label="Todo actions"]').trigger('click')
+  expect(todoItems[0].find('.todo-item__actions-panel').exists()).toBe(true)
+
+  await todoItems[1].find('[aria-label="Todo actions"]').trigger('click')
+  expect(todoItems[0].find('.todo-item__actions-panel').exists()).toBe(false)
+  expect(todoItems[1].find('.todo-item__actions-panel').exists()).toBe(true)
+
+  document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+  await todoList.vm.$nextTick()
+  expect(todoItems[1].find('.todo-item__actions-panel').exists()).toBe(false)
+  todoList.unmount()
+})
+
 test('Start one drag session with todo and pointer identity', () => {
   const todoList = mount(TodoList)
   const dragContainer = getTodoList(todoList).element

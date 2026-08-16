@@ -38,9 +38,12 @@
             :key="todo.id"
             :todo="todo"
             :placeholder="dragSession?.todoId === todo.id"
+            :actions-open="activeActionsTodoId === todo.id"
             @toggle-task="toggleTask"
             @delete-task="deleteTask"
             @update-name="updateName"
+            @toggle-actions="toggleActions"
+            @close-actions="activeActionsTodoId = null"
             @drag-start="startDrag"
           />
         </TransitionGroup>
@@ -56,7 +59,7 @@
 </template>
 
 <script setup>
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import DateTimeHeader from '@/components/DateTimeHeader.vue'
 import TodoItem from '@/components/TodoItem.vue'
 import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
@@ -70,6 +73,7 @@ const todos = ref([
 ])
 
 const dragSession = ref(null)
+const activeActionsTodoId = ref(null)
 const dragContainer = useTemplateRef('dragContainer')
 
 const activeTodo = computed(() => {
@@ -141,6 +145,25 @@ function toggleTask(id) {
 
   if (todo) { todo.done = !todo.done }
 }
+
+function toggleActions(id) {
+  activeActionsTodoId.value = activeActionsTodoId.value === id ? null : id
+}
+
+function closeActionsOutside(event) {
+  if (activeActionsTodoId.value === null) { return }
+  if (event.target instanceof Element && event.target.closest('.todo-item__actions')) { return }
+
+  activeActionsTodoId.value = null
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', closeActionsOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', closeActionsOutside)
+})
 
 function deleteTask(id) {
   todos.value = todos.value.filter(todo => id !== todo.id)
