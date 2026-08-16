@@ -7,7 +7,7 @@
       'todo-item_overlay': overlay,
       'todo-item_draggable': !overlay && !editing,
     }"
-    :aria-hidden="overlay || undefined"
+    :aria-hidden="overlay || placeholder || undefined"
     :inert="overlay"
     @pointerdown="startDrag"
   >
@@ -35,21 +35,49 @@
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
     >{{ todo.name }}</span>
-    <button
-      v-if="!editing"
-      class="todo-item__edit"
-      type="button"
-      :aria-label="`Edit ${todo.name}`"
-      @pointerdown.stop
-      @click="startEditing"
-    >
-      Edit
-    </button>
     <div
-      class="todo-item__delete"
+      class="todo-item__actions"
       @pointerdown.stop
-      @click="!overlay && emitDeleteTask()"
-    />
+    >
+      <button
+        v-if="!overlay"
+        class="todo-item__actions-toggle"
+        type="button"
+        aria-label="Todo actions"
+        :aria-expanded="actionsOpen"
+        :aria-controls="actionsId"
+        @click="actionsOpen = !actionsOpen"
+      >
+        …
+      </button>
+      <span
+        v-else
+        class="todo-item__actions-toggle"
+      >
+        …
+      </span>
+      <div
+        v-if="!overlay && actionsOpen"
+        :id="actionsId"
+        class="todo-item__actions-panel"
+      >
+        <button
+          v-if="!editing"
+          class="todo-item__edit"
+          type="button"
+          @click="startEditing"
+        >
+          Edit
+        </button>
+        <button
+          class="todo-item__delete"
+          type="button"
+          @click="emitDeleteTask"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
   </li>
 </template>
 
@@ -73,6 +101,8 @@ const element = useTemplateRef('element')
 const nameInput = useTemplateRef('nameInput')
 const editing = ref(false)
 const draftName = ref('')
+const actionsOpen = ref(false)
+const actionsId = `todo-actions-${props.todo.id}`
 
 function emitToggleTask() {
   if (props.overlay) { return }
@@ -83,12 +113,14 @@ function emitToggleTask() {
 function emitDeleteTask() {
   if (props.overlay) { return }
 
+  actionsOpen.value = false
   emit('deleteTask', props.todo.id)
 }
 
 async function startEditing() {
   if (props.overlay) { return }
 
+  actionsOpen.value = false
   draftName.value = props.todo.name
   editing.value = true
   await nextTick()
@@ -151,17 +183,16 @@ function startDrag(event) {
   user-select: none;
 }
 
-.todo-item__delete {
-  display: initial;
-  width: 30px;
-  cursor: pointer;
-  text-decoration: none;
-  color: #5a0700;
-  mask: url("@/assets/icons/close.svg") no-repeat center;
-  background: black;
+.todo-item__actions {
+  position: relative;
 }
 
-.todo-item__delete:hover {
-  background: #8F0000;
+.todo-item__actions-panel {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>
