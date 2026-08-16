@@ -8,20 +8,16 @@ afterEach(() => {
 
 test('Render the current English date, time, and ISO datetime', () => {
   vi.useFakeTimers()
-  const now = new Date('2026-08-16T14:37:42.000Z')
+  const now = new Date(2026, 7, 6, 14, 24, 42)
   vi.setSystemTime(now)
 
   const header = mount(DateTimeHeader)
 
-  expect(header.text()).toContain(new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }).format(now))
-  expect(header.text()).toContain(new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(now))
+  expect(header.text()).toContain('06')
+  expect(header.text()).toContain('August')
+  expect(header.text()).toContain('Thursday')
+  expect(header.text()).toContain('14:24')
+  expect(header.text()).not.toMatch(/AM|PM/)
   expect(header.attributes('datetime')).toBe(now.toISOString())
 })
 
@@ -38,6 +34,7 @@ test('Update at the next minute boundary', async () => {
   expect(header.text()).toContain(new Intl.DateTimeFormat('en-US', {
     hour: '2-digit',
     minute: '2-digit',
+    hourCycle: 'h23',
   }).format(nextMinute))
 })
 

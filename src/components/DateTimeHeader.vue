@@ -3,7 +3,9 @@
     class="date-time-header"
     :datetime="dateTime"
   >
-    <span>{{ formattedDate }}</span>
+    <span>{{ day }}</span>
+    <span>{{ month }}</span>
+    <span>{{ weekday }}</span>
     <span>{{ formattedTime }}</span>
   </time>
 </template>
@@ -11,20 +13,20 @@
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue'
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-})
+const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' })
+const weekdayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' })
 const timeFormatter = new Intl.DateTimeFormat('en-US', {
   hour: '2-digit',
   minute: '2-digit',
+  hourCycle: 'h23',
 })
 const now = ref(new Date())
 let minuteTimeout
 let minuteInterval
 
-const formattedDate = computed(() => dateFormatter.format(now.value))
+const day = computed(() => String(now.value.getDate()).padStart(2, '0'))
+const month = computed(() => monthFormatter.format(now.value))
+const weekday = computed(() => weekdayFormatter.format(now.value))
 const formattedTime = computed(() => timeFormatter.format(now.value))
 const dateTime = computed(() => now.value.toISOString())
 

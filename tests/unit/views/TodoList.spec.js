@@ -27,7 +27,7 @@ async function addTask(todoList, name) {
   const input = todoList.find('.todo-list__new-item')
 
   await input.setValue(name)
-  await input.trigger('keyup.enter')
+  await todoList.find('form').trigger('submit')
 }
 
 function startDrag(todoList, index = 0, pointerId = 7, clientX = 30, clientY = 50) {
@@ -55,14 +55,10 @@ test('Render the date and time header without the editable title', () => {
   expect(todoList.find('.todo-list__title').exists()).toBe(false)
 })
 
-test('Add a new task with the save button', async () => {
+test('Add a new task by submitting the form', async () => {
   const todoList = mount(TodoList)
 
-  const input = todoList.find('.todo-list__new-item')
-  await input.setValue('feed the cat')
-
-  const saveButton = todoList.find('.todo-list__button')
-  await saveButton.trigger('click')
+  await addTask(todoList, 'feed the cat')
 
   expect(todoList.text()).toContain('feed the cat')
 })
@@ -78,22 +74,9 @@ test('Render keyed todos inside the list transition group', () => {
   expect(todoList.find('.todo-item_overlay').exists()).toBe(false)
 })
 
-test('Add a new task by pressing the "enter" key', async () => {
-  const todoList = mount(TodoList)
-
-  const input = todoList.find('.todo-list__new-item')
-  await input.setValue('feed the cat')
-
-  await input.trigger('keyup.enter')
-
-  expect(todoList.text()).toContain('feed the cat')
-})
-
 test('Complete the task', async () => {
   const todoList = mount(TodoList)
-  const input = todoList.find('.todo-list__new-item')
-  await input.setValue('feed the cat')
-  await input.trigger('keyup.enter')
+  await addTask(todoList, 'feed the cat')
   const todoItem = getTodoItems(todoList)
     .find(item => item.props('todo').name === 'feed the cat')
   const taskName = todoItem.find('.todo-item__name')
@@ -105,9 +88,7 @@ test('Complete the task', async () => {
 
 test('Delete the task', async () => {
   const todoList = mount(TodoList)
-  const input = todoList.find('.todo-list__new-item')
-  await input.setValue('feed the cat')
-  await input.trigger('keyup.enter')
+  await addTask(todoList, 'feed the cat')
   const task = todoList
     .findAll('.todo-item')
     .filter(task => task.text().includes('feed the cat'))[0]

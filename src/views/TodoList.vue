@@ -4,45 +4,54 @@
       <DateTimeHeader />
     </header>
 
-    <ul
-      ref="dragContainer"
-      class="todo-list__container"
-      @pointermove="moveDrag"
-      @pointerup="finishDrag"
-      @pointercancel="finishDrag"
+    <form
+      class="todo-list__call-to-action"
+      aria-label="Add task"
+      @submit.prevent="addTask"
     >
-      <TransitionGroup name="todo-list">
-        <TodoItem
-          v-for="todo in todos"
-          :key="todo.id"
-          :todo="todo"
-          :placeholder="dragSession?.todoId === todo.id"
-          @toggle-task="toggleTask"
-          @delete-task="deleteTask"
-          @update-name="updateName"
-          @drag-start="startDrag"
-        />
-      </TransitionGroup>
-    </ul>
+      <input
+        v-model.trim="taskName"
+        class="todo-list__new-item"
+      >
+      <button
+        class="todo-list__button"
+        type="submit"
+        aria-label="Add task"
+      >
+        +
+      </button>
+    </form>
+    <section
+      class="todo-list__tasks"
+      aria-label="Todo list"
+    >
+      <ul
+        ref="dragContainer"
+        class="todo-list__container"
+        @pointermove="moveDrag"
+        @pointerup="finishDrag"
+        @pointercancel="finishDrag"
+      >
+        <TransitionGroup name="todo-list">
+          <TodoItem
+            v-for="todo in todos"
+            :key="todo.id"
+            :todo="todo"
+            :placeholder="dragSession?.todoId === todo.id"
+            @toggle-task="toggleTask"
+            @delete-task="deleteTask"
+            @update-name="updateName"
+            @drag-start="startDrag"
+          />
+        </TransitionGroup>
+      </ul>
+    </section>
     <TodoItem
       v-if="activeTodo"
       :todo="activeTodo"
       :style="dragOverlayStyle"
       overlay
     />
-    <div class="todo-list__call-to-action">
-      <input
-        v-model.trim="taskName"
-        class="todo-list__new-item"
-        @keyup.enter="addTask"
-      >
-      <button
-        class="todo-list__button"
-        @click="addTask"
-      >
-        +
-      </button>
-    </div>
   </div>
 </template>
 
@@ -179,11 +188,15 @@ function addTask() {
 }
 
 .todo-list__container {
-  grid-area: todos;
   margin: 0;
   padding: 30px;
   overflow: hidden;
   font-family: "Montserrat";
+}
+
+.todo-list__tasks {
+  grid-area: todos;
+  min-width: 0;
 }
 
 .todo-list-move {
