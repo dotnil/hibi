@@ -117,4 +117,38 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   background: currentColor;
 }
+
+@media (max-width: 48rem) {
+  .date-time-header {
+    min-height: 8rem;
+    padding: 1.25rem;
+  }
+
+  .date-time-header__date {
+    column-gap: 1rem;
+    padding-top: 1rem;
+  }
+
+  .date-time-header__dash {
+    top: 1.25rem;
+    left: 1.25rem;
+  }
+
+  .date-time-header__day {
+    font-size: 5rem;
+  }
+
+  .date-time-header__details {
+    font-size: 1rem;
+  }
+
+  .date-time-header__time {
+    font-size: 1.125rem;
+  }
+
+  .date-time-header__dot {
+    right: 1.25rem;
+    bottom: 1.25rem;
+  }
+}
 </style>

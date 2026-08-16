@@ -195,6 +195,9 @@ function addTask() {
 <style>
 .todo-list {
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: 100vh;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
@@ -263,5 +266,21 @@ button.todo-list__add-button {
 button.todo-list__add-button:focus-visible {
   outline: 2px solid #000;
   outline-offset: 0.25rem;
+}
+
+@media (max-width: 48rem) {
+  .todo-list__tasks {
+    padding: 1.25rem;
+  }
+
+  .todo-list__add-form {
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  button.todo-list__add-button {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
 }
 </style>

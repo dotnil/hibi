@@ -34,6 +34,9 @@ body {
 
 .app {
   font-family: "Montserrat";
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 100vh;
   color: #2c3e50;
   box-sizing: border-box;

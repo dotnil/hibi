@@ -278,4 +278,26 @@ button.todo-item__actions-toggle:focus-visible,
   font: inherit;
   cursor: pointer;
 }
+
+@media (max-width: 48rem) {
+  .todo-item {
+    column-gap: 1rem;
+    min-height: 5.5rem;
+    padding: 0 1rem;
+  }
+
+  .todo-item__name,
+  .todo-item__name-input {
+    font-size: 1rem;
+  }
+
+  .todo-item__checkbox {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .todo-item__checkbox:checked {
+    box-shadow: inset 0 0 0 0.25rem #fff;
+  }
+}
 </style>
