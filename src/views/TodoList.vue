@@ -208,13 +208,14 @@ function addTask() {
 
 .todo-list__items {
   margin: 0;
-  padding: 30px;
+  padding: 0;
   overflow: hidden;
   font-family: "Montserrat";
 }
 
 .todo-list__tasks {
   min-width: 0;
+  padding: 2rem;
 }
 
 .todo-list-move {

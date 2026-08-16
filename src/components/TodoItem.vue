@@ -159,9 +159,19 @@ function startDrag(event) {
 
 <style>
 .todo-item {
-  display: flex;
-  justify-content: space-between;
-  height: 40px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 2rem;
+  box-sizing: border-box;
+  min-height: 7.5rem;
+  padding: 0 2rem;
+  background: transparent;
+  border: 1px solid #d7d7d7;
+}
+
+.todo-item + .todo-item {
+  border-top: 0;
 }
 
 .todo-item_draggable {
@@ -179,20 +189,76 @@ function startDrag(event) {
   left: 0;
   z-index: 1;
   box-sizing: border-box;
+  border: 1px solid #d7d7d7;
   pointer-events: none;
 }
 
 .todo-item__name_completed {
   text-decoration: line-through;
-  color: #9a8c98;
+  color: #777;
+}
+
+.todo-item__name,
+.todo-item__name-input {
+  min-width: 0;
+  font-family: "Montserrat";
+  font-size: 1.125rem;
+  font-weight: 500;
 }
 
 .todo-item__name {
+  overflow-wrap: anywhere;
   user-select: none;
+}
+
+.todo-item__name-input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.todo-item__checkbox {
+  appearance: none;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  border: 1px solid #8a8a8a;
+  background: transparent;
+}
+
+.todo-item__checkbox:checked {
+  background: #000;
+  box-shadow: inset 0 0 0 0.35rem #fff;
+}
+
+.todo-item__checkbox:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.2rem;
 }
 
 .todo-item__actions {
   position: relative;
+}
+
+.todo-item__actions-toggle {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+button.todo-item__actions-toggle {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+button.todo-item__actions-toggle:focus-visible,
+.todo-item__actions-panel button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.2rem;
 }
 
 .todo-item__actions-panel {
@@ -202,5 +268,14 @@ function startDrag(event) {
   right: 100%;
   display: flex;
   flex-direction: column;
+  background: #fff;
+}
+
+.todo-item__actions-panel button {
+  border: 0;
+  background: transparent;
+  color: #000;
+  font: inherit;
+  cursor: pointer;
 }
 </style>
