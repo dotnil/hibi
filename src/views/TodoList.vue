@@ -12,6 +12,8 @@
       <input
         v-model.trim="taskName"
         class="todo-list__add-input"
+        placeholder="What needs to be done?"
+        aria-label="Task name"
       >
       <button
         class="todo-list__add-button"
@@ -221,31 +223,44 @@ function addTask() {
 
 .todo-list__add-form {
   display: flex;
+  align-items: stretch;
+  gap: 2rem;
   min-width: 0;
+  padding: 2rem;
   box-sizing: border-box;
 }
 
 .todo-list__add-input {
   flex: 1;
   min-width: 0;
-  background: none;
-  border: none;
-  box-shadow: 0 5px 30px rgba(55, 63, 81, 0.1);
-  background-color: #FAF7F5;
+  font-family: "Montserrat";
+  font-size: 1.25rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+}
+
+.todo-list__add-input::placeholder {
+  color: #a0a0a0;
 }
 
 button.todo-list__add-button {
   all: unset;
   display: flex;
   justify-content: center;
-  cursor: pointer;
-  background-color: #FAF7F5;
-  width: 80px;
-  font-size: 60px;
   align-items: center;
+  box-sizing: border-box;
+  width: 5rem;
+  height: 5rem;
+  cursor: pointer;
+  color: #fff;
+  background: #000;
+  font-size: 2.5rem;
+  font-weight: 300;
 }
 
-button.todo-list__add-button:hover {
-  background-color: #FAF7F5;
+button.todo-list__add-button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.25rem;
 }
 </style>
