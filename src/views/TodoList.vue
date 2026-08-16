@@ -1,20 +1,20 @@
 <template>
-  <div class="todo-list__wrapper">
+  <div class="todo-list">
     <header class="todo-list__header">
       <DateTimeHeader />
     </header>
 
     <form
-      class="todo-list__call-to-action"
+      class="todo-list__add-form"
       aria-label="Add task"
       @submit.prevent="addTask"
     >
       <input
         v-model.trim="taskName"
-        class="todo-list__new-item"
+        class="todo-list__add-input"
       >
       <button
-        class="todo-list__button"
+        class="todo-list__add-button"
         type="submit"
         aria-label="Add task"
       >
@@ -27,7 +27,7 @@
     >
       <ul
         ref="dragContainer"
-        class="todo-list__container"
+        class="todo-list__items"
         @pointermove="moveDrag"
         @pointerup="finishDrag"
         @pointercancel="finishDrag"
@@ -168,26 +168,20 @@ function addTask() {
 </script>
 
 <style>
-.todo-list__wrapper {
+.todo-list {
   box-sizing: border-box;
   height: 100vh;
   display: grid;
-  grid-template-areas:
-    'title-list title-list'
-    'todos      todos     '
-    'new-task   submit    ';
-  grid-template-columns: 2fr;
-  grid-template-rows: 160px auto 80px;
+  grid-template-rows: auto auto minmax(0, 1fr);
   font-size: 40px;
   position: relative;
 }
 
 .todo-list__header {
-  grid-area: title-list;
   min-width: 0;
 }
 
-.todo-list__container {
+.todo-list__items {
   margin: 0;
   padding: 30px;
   overflow: hidden;
@@ -195,7 +189,6 @@ function addTask() {
 }
 
 .todo-list__tasks {
-  grid-area: todos;
   min-width: 0;
 }
 
@@ -203,25 +196,23 @@ function addTask() {
   transition: transform 120ms ease;
 }
 
-.todo-list__call-to-action {
-  grid-area: new-task;
-  display: contents;
-  align-self: end;
+.todo-list__add-form {
+  display: flex;
+  min-width: 0;
   box-sizing: border-box;
 }
 
-.todo-list__new-item {
-  grid-area: new-task;
-  width: 100%;
+.todo-list__add-input {
+  flex: 1;
+  min-width: 0;
   background: none;
   border: none;
   box-shadow: 0 5px 30px rgba(55, 63, 81, 0.1);
   background-color: #FAF7F5;
 }
 
-button.todo-list__button {
+button.todo-list__add-button {
   all: unset;
-  grid-area: submit;
   display: flex;
   justify-content: center;
   cursor: pointer;
@@ -231,7 +222,7 @@ button.todo-list__button {
   align-items: center;
 }
 
-button.todo-list__button:hover {
+button.todo-list__add-button:hover {
   background-color: #FAF7F5;
 }
 </style>

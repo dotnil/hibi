@@ -3,10 +3,14 @@
     class="date-time-header"
     :datetime="dateTime"
   >
-    <span>{{ day }}</span>
-    <span>{{ month }}</span>
-    <span>{{ weekday }}</span>
-    <span>{{ formattedTime }}</span>
+    <span class="date-time-header__date">
+      <span class="date-time-header__day">{{ day }}</span>
+      <span class="date-time-header__details">
+        <span class="date-time-header__month">{{ month }}</span>
+        <span class="date-time-header__weekday">{{ weekday }}</span>
+      </span>
+    </span>
+    <span class="date-time-header__time">{{ formattedTime }}</span>
   </time>
 </template>
 
@@ -49,7 +53,24 @@ onBeforeUnmount(() => {
 .date-time-header {
   display: flex;
   justify-content: space-between;
+  min-width: 0;
   font-family: "Montserrat";
   font-size: 0.5em;
+}
+
+.date-time-header__date {
+  display: flex;
+  column-gap: 1rem;
+  min-width: 0;
+}
+
+.date-time-header__details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.date-time-header__time {
+  white-space: nowrap;
 }
 </style>

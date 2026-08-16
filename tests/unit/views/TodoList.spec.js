@@ -23,16 +23,25 @@ function getTodoNames(todoList) {
   return getTodoItems(todoList).map(todoItem => todoItem.props('todo').name)
 }
 
+function getAddForm(todoList) {
+  return todoList.find('form[aria-label="Add task"]')
+}
+
+function getTodoList(todoList) {
+  return todoList.find('section[aria-label="Todo list"] ul')
+}
+
 async function addTask(todoList, name) {
-  const input = todoList.find('.todo-list__new-item')
+  const form = getAddForm(todoList)
+  const input = form.find('input')
 
   await input.setValue(name)
-  await todoList.find('form').trigger('submit')
+  await form.trigger('submit')
 }
 
 function startDrag(todoList, index = 0, pointerId = 7, clientX = 30, clientY = 50) {
   const todoItem = getTodoItems(todoList)[index]
-  const dragContainer = todoList.find('.todo-list__container').element
+  const dragContainer = getTodoList(todoList).element
   const event = createPointerEvent(pointerId, clientX, clientY)
   const cardRect = {
     left: 10,
@@ -69,7 +78,7 @@ test('Render keyed todos inside the list transition group', () => {
 
   expect(transitionGroup.exists()).toBe(true)
   expect(transitionGroup.props('name')).toBe('todo-list')
-  expect(todoList.find('.todo-list__container').element.tagName).toBe('UL')
+  expect(getTodoList(todoList).element.tagName).toBe('UL')
   expect(transitionGroup.findAllComponents(TodoItem)).toHaveLength(2)
   expect(todoList.find('.todo-item_overlay').exists()).toBe(false)
 })
@@ -114,7 +123,7 @@ test('Edit the selected task name', async () => {
 
 test('Start one drag session with todo and pointer identity', () => {
   const todoList = mount(TodoList)
-  const dragContainer = todoList.find('.todo-list__container').element
+  const dragContainer = getTodoList(todoList).element
   dragContainer.setPointerCapture = vi.fn()
   const todoItem = startDrag(todoList)
 
@@ -173,7 +182,7 @@ test('Move the overlay with the active pointer while preserving the grab point',
   const todoList = mount(TodoList)
   startDrag(todoList)
 
-  await todoList.find('.todo-list__container').trigger('pointermove', {
+  await getTodoList(todoList).trigger('pointermove', {
     pointerId: 7,
     clientX: 80,
     clientY: 100,
@@ -188,7 +197,7 @@ test('Move a todo down to the next position during drag', async () => {
   const todoList = mount(TodoList)
   startDrag(todoList)
 
-  await todoList.find('.todo-list__container').trigger('pointermove', {
+  await getTodoList(todoList).trigger('pointermove', {
     pointerId: 7,
     clientX: 30,
     clientY: 111,
@@ -202,7 +211,7 @@ test('Move a todo up to the previous position during drag', async () => {
   const todoList = mount(TodoList)
   startDrag(todoList, 1, 7, 30, 90)
 
-  await todoList.find('.todo-list__container').trigger('pointermove', {
+  await getTodoList(todoList).trigger('pointermove', {
     pointerId: 7,
     clientX: 30,
     clientY: 29,
@@ -218,7 +227,7 @@ test('Move a todo through several positions in one pointer move', async () => {
   await addTask(todoList, 'fourth')
   startDrag(todoList)
 
-  await todoList.find('.todo-list__container').trigger('pointermove', {
+  await getTodoList(todoList).trigger('pointermove', {
     pointerId: 7,
     clientX: 30,
     clientY: 191,
@@ -231,7 +240,7 @@ test('Move a todo through several positions in one pointer move', async () => {
 test('Reverse a previous live reorder after crossing the opposite boundary', async () => {
   const todoList = mount(TodoList)
   startDrag(todoList)
-  const dragContainer = todoList.find('.todo-list__container')
+  const dragContainer = getTodoList(todoList)
 
   await dragContainer.trigger('pointermove', { pointerId: 7, clientX: 30, clientY: 111 })
   await dragContainer.trigger('pointermove', { pointerId: 7, clientX: 30, clientY: 49 })
@@ -246,7 +255,7 @@ test('Do not reorder when the dragged center is exactly at the boundary', async 
   const todoList = mount(TodoList)
   startDrag(todoList)
 
-  await todoList.find('.todo-list__container').trigger('pointermove', {
+  await getTodoList(todoList).trigger('pointermove', {
     pointerId: 7,
     clientX: 30,
     clientY: 90,
@@ -260,7 +269,7 @@ test('Do not move the overlay for a foreign pointer', async () => {
   const todoList = mount(TodoList)
   startDrag(todoList)
 
-  await todoList.find('.todo-list__container').trigger('pointermove', {
+  await getTodoList(todoList).trigger('pointermove', {
     pointerId: 8,
     clientX: 80,
     clientY: 100,
@@ -275,7 +284,7 @@ test('Do not move the overlay for a foreign pointer', async () => {
 test('Keep the live order after drag end', async () => {
   const todoList = mount(TodoList)
   startDrag(todoList)
-  const dragContainer = todoList.find('.todo-list__container')
+  const dragContainer = getTodoList(todoList)
 
   await dragContainer.trigger('pointermove', { pointerId: 7, clientX: 30, clientY: 111 })
   await dragContainer.trigger('pointerup', { pointerId: 7 })
@@ -289,7 +298,7 @@ test.each(['pointerup', 'pointercancel'])(
   'Clear the session on active %s but ignore a foreign pointer',
   async (pointerEvent) => {
     const todoList = mount(TodoList)
-    const dragContainer = todoList.find('.todo-list__container')
+    const dragContainer = getTodoList(todoList)
 
     startDrag(todoList)
     await dragContainer.trigger(pointerEvent, { pointerId: 8 })
