@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { TransitionGroup } from 'vue'
+import DateTimeHeader from '@/components/DateTimeHeader.vue'
 import TodoItem from '@/components/TodoItem.vue'
 import TodoList from '@/views/TodoList.vue'
 import { expect, test, vi } from 'vitest'
@@ -45,6 +46,14 @@ function startDrag(todoList, index = 0, pointerId = 7, clientX = 30, clientY = 5
 
   return todoItem
 }
+
+test('Render the date and time header without the editable title', () => {
+  const todoList = mount(TodoList)
+  const header = todoList.find('header')
+
+  expect(header.findComponent(DateTimeHeader).exists()).toBe(true)
+  expect(todoList.find('.todo-list__title').exists()).toBe(false)
+})
 
 test('Add a new task with the save button', async () => {
   const todoList = mount(TodoList)

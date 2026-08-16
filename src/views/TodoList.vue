@@ -1,9 +1,8 @@
 <template>
   <div class="todo-list__wrapper">
-    <input
-      v-model="title"
-      class="todo-list__title"
-    >
+    <header class="todo-list__header">
+      <DateTimeHeader />
+    </header>
 
     <ul
       ref="dragContainer"
@@ -49,13 +48,12 @@
 
 <script setup>
 import { computed, ref, useTemplateRef } from 'vue'
+import DateTimeHeader from '@/components/DateTimeHeader.vue'
 import TodoItem from '@/components/TodoItem.vue'
 import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
 import { moveItem } from '@/utils/moveItem'
 
 const taskName = ref('')
-
-const title = ref('Todo')
 
 const todos = ref([
   { name: 'function', done: false, id: crypto.randomUUID() },
@@ -175,20 +173,9 @@ function addTask() {
   position: relative;
 }
 
-.todo-list__title {
+.todo-list__header {
   grid-area: title-list;
-  font-family: "Vensfolk";
-  border: none;
-  background: none;
-  color: inherit;
-  display: block;
-  font-size: 3em;
-  width: 100vw;
-  padding: 0;
-}
-
-.todo-list__title:focus {
-  outline: none;
+  min-width: 0;
 }
 
 .todo-list__container {
