@@ -14,7 +14,7 @@ test('Render the current English date, time, and ISO datetime', () => {
   const header = mount(DateTimeHeader)
 
   expect(header.text()).toContain('06')
-  expect(header.text()).toContain('August')
+  expect(header.text()).toContain('Aug')
   expect(header.text()).toContain('Thursday')
   expect(header.text()).toContain('14:24')
   expect(header.text()).not.toMatch(/AM|PM/)

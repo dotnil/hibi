@@ -11,13 +11,21 @@
       </span>
     </span>
     <span class="date-time-header__time">{{ formattedTime }}</span>
+    <span
+      class="date-time-header__dash"
+      aria-hidden="true"
+    />
+    <span
+      class="date-time-header__dot"
+      aria-hidden="true"
+    />
   </time>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue'
 
-const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' })
+const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'short' })
 const weekdayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' })
 const timeFormatter = new Intl.DateTimeFormat('en-US', {
   hour: '2-digit',
@@ -51,26 +59,62 @@ onBeforeUnmount(() => {
 
 <style>
 .date-time-header {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   min-width: 0;
+  min-height: 12rem;
+  padding: 2rem;
   font-family: "Montserrat";
-  font-size: 0.5em;
 }
 
 .date-time-header__date {
   display: flex;
-  column-gap: 1rem;
+  align-items: stretch;
+  column-gap: 1.5rem;
   min-width: 0;
+  padding-top: 1.25rem;
+}
+
+.date-time-header__dash {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  width: 3rem;
+  height: 0.125rem;
+  background: currentColor;
+}
+
+.date-time-header__day {
+  font-family: "Libre Bodoni", serif;
+  font-size: 8rem;
+  font-weight: 400;
+  line-height: 0.8;
 }
 
 .date-time-header__details {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   min-width: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
 }
 
 .date-time-header__time {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.date-time-header__dot {
+  position: absolute;
+  right: 2rem;
+  bottom: 2rem;
+  width: 1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: currentColor;
 }
 </style>

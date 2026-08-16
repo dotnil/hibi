@@ -15,6 +15,14 @@ import TodoList from '@/views/TodoList.vue'
 }
 
 @font-face {
+  font-family: "Libre Bodoni";
+  src: url('assets/libre-bodoni-regular.woff2') format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Vensfolk";
   src: url('assets/vensfolk.otf') format('opentype');
 }
