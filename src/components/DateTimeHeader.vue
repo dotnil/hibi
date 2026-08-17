@@ -66,7 +66,6 @@ onBeforeUnmount(() => {
   min-width: 0;
   min-height: 12rem;
   padding: 2rem;
-  font-family: "Montserrat";
 }
 
 .date-time-header__date {

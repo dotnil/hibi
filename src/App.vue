@@ -10,8 +10,8 @@ import TodoList from '@/views/TodoList.vue'
 
 <style>
 @font-face {
-  font-family: "Montserrat";
-  src: url('assets/montserrat-regular.woff2') format("woff2");
+  font-family: "Urbanist";
+  src: url('assets/urbanist-regular.woff2') format("woff2");
 }
 
 @font-face {
@@ -22,23 +22,17 @@ import TodoList from '@/views/TodoList.vue'
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Vensfolk";
-  src: url('assets/vensfolk.otf') format('opentype');
-}
-
 body {
   margin: 0;
-  background-image: linear-gradient(35deg, #fdfcfb 0%, #e2d1c3 100%);
 }
 
 .app {
-  font-family: "Montserrat";
+  font-family: "Urbanist";
   width: 100%;
   min-width: 0;
   max-width: 100%;
   min-height: 100vh;
-  color: #2c3e50;
+  color: #202020;
   box-sizing: border-box;
 }
 

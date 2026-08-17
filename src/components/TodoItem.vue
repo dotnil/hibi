@@ -201,7 +201,6 @@ function startDrag(event) {
 .todo-item__name,
 .todo-item__name-input {
   min-width: 0;
-  font-family: "Montserrat";
   font-size: 1.125rem;
   font-weight: 500;
 }

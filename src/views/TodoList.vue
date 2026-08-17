@@ -213,7 +213,6 @@ function addTask() {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family: "Montserrat";
 }
 
 .todo-list__tasks {
@@ -237,11 +236,10 @@ function addTask() {
 .todo-list__add-input {
   flex: 1;
   min-width: 0;
-  font-family: "Montserrat";
   font-size: 1.25rem;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid currentColor;
+  border-bottom: 1px solid #a0a0a0;
 }
 
 .todo-list__add-input::placeholder {
@@ -258,9 +256,10 @@ button.todo-list__add-button {
   height: 5rem;
   cursor: pointer;
   color: #fff;
-  background: #000;
+  background: #202020;
   font-size: 2.5rem;
   font-weight: 300;
+  border-radius: 6px;
 }
 
 button.todo-list__add-button:focus-visible {
