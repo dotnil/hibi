@@ -182,7 +182,9 @@ function startDrag(event) {
 .todo-item_placeholder {
   visibility: hidden;
 }
-
+.todo-item_placeholder + .todo-item {
+  border-top: 1px solid #d7d7d7;
+}
 .todo-item_overlay {
   position: fixed;
   top: 0;
@@ -266,16 +268,24 @@ button.todo-item__actions-toggle:focus-visible,
   top: 0;
   right: 100%;
   display: flex;
-  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid #d7d7d7;
   background: #fff;
 }
 
 .todo-item__actions-panel button {
-  border: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
   background: transparent;
   color: #000;
   font: inherit;
   cursor: pointer;
+}
+
+.todo-item__actions-panel button:hover {
+  background: #f0f0f0;
+  border: 1px solid #d7d7d7;
 }
 
 @media (max-width: 48rem) {

@@ -212,7 +212,7 @@ function addTask() {
 .todo-list__items {
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .todo-list__tasks {
@@ -237,6 +237,7 @@ function addTask() {
   flex: 1;
   min-width: 0;
   font-size: 1.25rem;
+  font-family: inherit;
   background: transparent;
   border: 0;
   border-bottom: 1px solid #a0a0a0;
