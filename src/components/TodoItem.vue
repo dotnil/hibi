@@ -162,10 +162,10 @@ function startDrag(event) {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: 2rem;
+  column-gap: clamp(1rem, 3vw, 2rem);
   box-sizing: border-box;
-  min-height: 7.5rem;
-  padding: 0 2rem;
+  min-height: clamp(5.5rem, 10vw, 7.5rem);
+  padding: 0 clamp(1rem, 3vw, 2rem);
   background: transparent;
   border: 1px solid #d7d7d7;
 }
@@ -197,13 +197,13 @@ function startDrag(event) {
 
 .todo-item__name_completed {
   text-decoration: line-through;
-  color: #777;
+  color: #d7d7d7;
 }
 
 .todo-item__name,
 .todo-item__name-input {
   min-width: 0;
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-weight: 500;
 }
 
@@ -220,16 +220,16 @@ function startDrag(event) {
 .todo-item__checkbox {
   appearance: none;
   box-sizing: border-box;
-  width: 2rem;
-  height: 2rem;
+  width: clamp(1.5rem, 2.5vw, 2rem);
+  height: clamp(1.5rem, 2.5vw, 2rem);
   margin: 0;
-  border: 1px solid #8a8a8a;
+  border: 1px solid #d7d7d7;
   background: transparent;
 }
 
 .todo-item__checkbox:checked {
   background: #000;
-  box-shadow: inset 0 0 0 0.35rem #fff;
+  box-shadow: inset 0 0 0 clamp(0.25rem, 0.5vw, 0.35rem) #fff;
 }
 
 .todo-item__checkbox:focus-visible {
@@ -272,6 +272,7 @@ button.todo-item__actions-toggle:focus-visible,
   padding: 0.25rem;
   border: 1px solid #d7d7d7;
   background: #fff;
+  font-size: 1rem;
 }
 
 .todo-item__actions-panel button {
@@ -284,29 +285,7 @@ button.todo-item__actions-toggle:focus-visible,
 }
 
 .todo-item__actions-panel button:hover {
-  background: #f0f0f0;
   border: 1px solid #d7d7d7;
 }
 
-@media (max-width: 48rem) {
-  .todo-item {
-    column-gap: 1rem;
-    min-height: 5.5rem;
-    padding: 0 1rem;
-  }
-
-  .todo-item__name,
-  .todo-item__name-input {
-    font-size: 1rem;
-  }
-
-  .todo-item__checkbox {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  .todo-item__checkbox:checked {
-    box-shadow: inset 0 0 0 0.25rem #fff;
-  }
-}
 </style>

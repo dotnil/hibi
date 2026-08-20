@@ -201,7 +201,6 @@ function addTask() {
   height: 100vh;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  font-size: 40px;
   position: relative;
 }
 
@@ -217,7 +216,7 @@ function addTask() {
 
 .todo-list__tasks {
   min-width: 0;
-  padding: 2rem;
+  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
 }
 
 .todo-list-move {
@@ -227,24 +226,24 @@ function addTask() {
 .todo-list__add-form {
   display: flex;
   align-items: stretch;
-  gap: 2rem;
+  gap: clamp(1rem, 3vw, 2rem);
   min-width: 0;
-  padding: 2rem;
+  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
   box-sizing: border-box;
 }
 
 .todo-list__add-input {
   flex: 1;
   min-width: 0;
-  font-size: 1.25rem;
+  font-size: clamp(1.375rem, 2.5vw, 1.5rem);
   font-family: inherit;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid #a0a0a0;
+  border-bottom: 1px solid #d7d7d7;
 }
 
 .todo-list__add-input::placeholder {
-  color: #a0a0a0;
+  color: #d7d7d7;
 }
 
 button.todo-list__add-button {
@@ -253,8 +252,8 @@ button.todo-list__add-button {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  width: 5rem;
-  height: 5rem;
+  width: clamp(3.5rem, 5.3vw, 5rem);
+  height: clamp(3.5rem, 5.3vw, 5rem);
   cursor: pointer;
   color: #fff;
   background: #202020;
@@ -268,19 +267,4 @@ button.todo-list__add-button:focus-visible {
   outline-offset: 0.25rem;
 }
 
-@media (max-width: 48rem) {
-  .todo-list__tasks {
-    padding: 1.25rem;
-  }
-
-  .todo-list__add-form {
-    gap: 1rem;
-    padding: 1.25rem;
-  }
-
-  button.todo-list__add-button {
-    width: 3.5rem;
-    height: 3.5rem;
-  }
-}
 </style>
