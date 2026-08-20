@@ -164,7 +164,7 @@ function startDrag(event) {
   align-items: center;
   column-gap: clamp(1rem, 3vw, 2rem);
   box-sizing: border-box;
-  min-height: clamp(5.5rem, 10vw, 7.5rem);
+  min-height: clamp(3.5rem, 5.3vw, 5rem);
   padding: 0 clamp(1rem, 3vw, 2rem);
   background: transparent;
   border: 1px solid #d7d7d7;
@@ -204,7 +204,6 @@ function startDrag(event) {
 .todo-item__name-input {
   min-width: 0;
   font-size: 1.375rem;
-  font-weight: 500;
 }
 
 .todo-item__name {
@@ -225,11 +224,14 @@ function startDrag(event) {
   margin: 0;
   border: 1px solid #d7d7d7;
   background: transparent;
+  border-radius: 4px;
 }
 
 .todo-item__checkbox:checked {
-  background: #000;
-  box-shadow: inset 0 0 0 clamp(0.25rem, 0.5vw, 0.35rem) #fff;
+  padding: clamp(0.25rem, 0.5vw, 0.35rem);
+  background: #d7d7d7;
+  background-clip: content-box;
+  border-radius: 4px;
 }
 
 .todo-item__checkbox:focus-visible {
@@ -243,16 +245,18 @@ function startDrag(event) {
 
 .todo-item__actions-toggle {
   display: grid;
-  place-items: center;
   box-sizing: border-box;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  color: #d7d7d7;
 }
 
 button.todo-item__actions-toggle {
   border: 0;
   background: transparent;
-  color: inherit;
+  color: #d7d7d7;
   cursor: pointer;
 }
 

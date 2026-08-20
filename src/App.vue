@@ -10,6 +10,15 @@ import TodoList from '@/views/TodoList.vue'
 
 <style>
 @font-face {
+  font-family: "Inter";
+  src: url('assets/inter-cyrillic.woff2') format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
   font-family: "Urbanist";
   src: url('assets/urbanist-regular.woff2') format("woff2");
 }
@@ -27,9 +36,9 @@ body {
 }
 
 .app {
-  font-family: "Urbanist";
+  font-family: "Urbanist", "Inter", sans-serif;
   width: 100%;
-  min-width: 0;
+  min-width: 20rem;
   max-width: 100%;
   min-height: 100vh;
   color: #202020;

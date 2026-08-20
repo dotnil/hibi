@@ -62,15 +62,12 @@ onBeforeUnmount(() => {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  min-width: 0;
   min-height: clamp(8rem, calc(3.84rem + 8.66vw), 12rem);
-  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
+  padding: var(--header-inset) var(--header-gutter);
 }
 
 .date-time-header__date {
   display: flex;
-  align-items: stretch;
   column-gap: clamp(1rem, 2vw, 1.5rem);
   align-self: end;
   min-width: 0;
@@ -78,8 +75,8 @@ onBeforeUnmount(() => {
 
 .date-time-header__dash {
   position: absolute;
-  top: clamp(1.25rem, 2.1vw, 2rem);
-  left: clamp(1.25rem, 6vw, 5rem);
+  top: var(--header-inset);
+  left: var(--header-gutter);
   width: 1rem;
   height: 0.125rem;
   background: currentColor;
@@ -96,13 +93,12 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-width: 0;
   font-size: clamp(1rem, 2vw, 1.5rem);
-  line-height: 1.5;
   font-weight: 600;
 }
 
 .date-time-header__time {
+  align-self: start;
   font-size: clamp(1.125rem, 2vw, 1.5rem);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -111,8 +107,8 @@ onBeforeUnmount(() => {
 
 .date-time-header__dot {
   position: absolute;
-  right: clamp(1.25rem, 6vw, 5rem);
-  bottom: clamp(1.25rem, 2.1vw, 2rem);
+  right: var(--header-gutter);
+  bottom: var(--header-inset);
   width: 1rem;
   aspect-ratio: 1;
   border-radius: 50%;

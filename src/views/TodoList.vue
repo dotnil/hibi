@@ -205,6 +205,8 @@ function addTask() {
 }
 
 .todo-list__header {
+  --header-gutter: clamp(1.25rem, 6vw, 5rem);
+  --header-inset: clamp(1.25rem, 2.1vw, 2rem);
   min-width: 0;
 }
 
@@ -240,6 +242,11 @@ function addTask() {
   background: transparent;
   border: 0;
   border-bottom: 1px solid #d7d7d7;
+  outline: none;
+}
+
+.todo-list__add-input:focus {
+  border-bottom-color: #202020;
 }
 
 .todo-list__add-input::placeholder {
