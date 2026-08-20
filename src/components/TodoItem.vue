@@ -7,8 +7,8 @@
       'todo-item_overlay': overlay,
       'todo-item_draggable': !overlay && !editing,
     }"
-    :aria-hidden="overlay || undefined"
-    :inert="overlay"
+    :aria-hidden="overlay || placeholder || undefined"
+    :inert="overlay || placeholder"
     @pointerdown="startDrag"
   >
     <input
@@ -35,21 +35,49 @@
       class="todo-item__name"
       :class="{ 'todo-item__name_completed': todo.done }"
     >{{ todo.name }}</span>
-    <button
-      v-if="!editing"
-      class="todo-item__edit"
-      type="button"
-      :aria-label="`Edit ${todo.name}`"
-      @pointerdown.stop
-      @click="startEditing"
-    >
-      Edit
-    </button>
     <div
-      class="todo-item__delete"
+      class="todo-item__actions"
       @pointerdown.stop
-      @click="!overlay && emitDeleteTask()"
-    />
+    >
+      <button
+        v-if="!overlay && !placeholder"
+        class="todo-item__actions-toggle"
+        type="button"
+        aria-label="Todo actions"
+        :aria-expanded="actionsOpen"
+        :aria-controls="actionsId"
+        @click="emitToggleActions"
+      >
+        …
+      </button>
+      <span
+        v-else
+        class="todo-item__actions-toggle"
+      >
+        …
+      </span>
+      <div
+        v-if="!overlay && !placeholder && actionsOpen"
+        :id="actionsId"
+        class="todo-item__actions-panel"
+      >
+        <button
+          v-if="!editing"
+          class="todo-item__edit"
+          type="button"
+          @click="startEditing"
+        >
+          Edit
+        </button>
+        <button
+          class="todo-item__delete"
+          type="button"
+          @click="emitDeleteTask"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
   </li>
 </template>
 
@@ -60,6 +88,8 @@ const emit = defineEmits([
   'toggleTask',
   'deleteTask',
   'updateName',
+  'toggleActions',
+  'closeActions',
   'dragStart',
 ])
 
@@ -67,12 +97,14 @@ const props = defineProps({
   todo: { type: Object, required: true },
   placeholder: { type: Boolean, default: false },
   overlay: { type: Boolean, default: false },
+  actionsOpen: { type: Boolean, default: false },
 })
 
 const element = useTemplateRef('element')
 const nameInput = useTemplateRef('nameInput')
 const editing = ref(false)
 const draftName = ref('')
+const actionsId = `todo-actions-${props.todo.id}`
 
 function emitToggleTask() {
   if (props.overlay) { return }
@@ -83,12 +115,20 @@ function emitToggleTask() {
 function emitDeleteTask() {
   if (props.overlay) { return }
 
+  emit('closeActions')
   emit('deleteTask', props.todo.id)
+}
+
+function emitToggleActions() {
+  if (props.overlay || props.placeholder) { return }
+
+  emit('toggleActions', props.todo.id)
 }
 
 async function startEditing() {
   if (props.overlay) { return }
 
+  emit('closeActions')
   draftName.value = props.todo.name
   editing.value = true
   await nextTick()
@@ -119,9 +159,19 @@ function startDrag(event) {
 
 <style>
 .todo-item {
-  display: flex;
-  justify-content: space-between;
-  height: 40px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(1rem, 3vw, 2rem);
+  box-sizing: border-box;
+  min-height: clamp(3.5rem, 5.3vw, 5rem);
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  background: transparent;
+  border: 1px solid #d7d7d7;
+}
+
+.todo-item + .todo-item {
+  border-top: 0;
 }
 
 .todo-item_draggable {
@@ -132,36 +182,114 @@ function startDrag(event) {
 .todo-item_placeholder {
   visibility: hidden;
 }
-
+.todo-item_placeholder + .todo-item {
+  border-top: 1px solid #d7d7d7;
+}
 .todo-item_overlay {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1;
   box-sizing: border-box;
+  border: 1px solid #d7d7d7;
   pointer-events: none;
 }
 
 .todo-item__name_completed {
   text-decoration: line-through;
-  color: #9a8c98;
+  color: #d7d7d7;
+}
+
+.todo-item__name,
+.todo-item__name-input {
+  min-width: 0;
+  font-size: 1.375rem;
 }
 
 .todo-item__name {
+  overflow-wrap: anywhere;
   user-select: none;
 }
 
-.todo-item__delete {
-  display: initial;
-  width: 30px;
-  cursor: pointer;
-  text-decoration: none;
-  color: #5a0700;
-  mask: url("@/assets/icons/close.svg") no-repeat center;
-  background: black;
+.todo-item__name-input {
+  box-sizing: border-box;
+  width: 100%;
 }
 
-.todo-item__delete:hover {
-  background: #8F0000;
+.todo-item__checkbox {
+  appearance: none;
+  box-sizing: border-box;
+  width: clamp(1.5rem, 2.5vw, 2rem);
+  height: clamp(1.5rem, 2.5vw, 2rem);
+  margin: 0;
+  border: 1px solid #d7d7d7;
+  background: transparent;
+  border-radius: 4px;
 }
+
+.todo-item__checkbox:checked {
+  padding: clamp(0.25rem, 0.5vw, 0.35rem);
+  background: #d7d7d7;
+  background-clip: content-box;
+  border-radius: 4px;
+}
+
+.todo-item__checkbox:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.2rem;
+}
+
+.todo-item__actions {
+  position: relative;
+}
+
+.todo-item__actions-toggle {
+  display: grid;
+  box-sizing: border-box;
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  color: #d7d7d7;
+}
+
+button.todo-item__actions-toggle {
+  border: 0;
+  background: transparent;
+  color: #d7d7d7;
+  cursor: pointer;
+}
+
+button.todo-item__actions-toggle:focus-visible,
+.todo-item__actions-panel button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.2rem;
+}
+
+.todo-item__actions-panel {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 100%;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  font-size: 1rem;
+}
+
+.todo-item__actions-panel button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #000;
+  font: inherit;
+  cursor: pointer;
+}
+
+.todo-item__actions-panel button:hover {
+  border: 1px solid #d7d7d7;
+}
+
 </style>

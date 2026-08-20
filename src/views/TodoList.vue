@@ -1,61 +1,73 @@
 <template>
-  <div class="todo-list__wrapper">
-    <input
-      v-model="title"
-      class="todo-list__title"
-    >
+  <div class="todo-list">
+    <header class="todo-list__header">
+      <DateTimeHeader />
+    </header>
 
-    <ul
-      ref="dragContainer"
-      class="todo-list__container"
-      @pointermove="moveDrag"
-      @pointerup="finishDrag"
-      @pointercancel="finishDrag"
+    <form
+      class="todo-list__add-form"
+      aria-label="Add task"
+      @submit.prevent="addTask"
     >
-      <TransitionGroup name="todo-list">
-        <TodoItem
-          v-for="todo in todos"
-          :key="todo.id"
-          :todo="todo"
-          :placeholder="dragSession?.todoId === todo.id"
-          @toggle-task="toggleTask"
-          @delete-task="deleteTask"
-          @update-name="updateName"
-          @drag-start="startDrag"
-        />
-      </TransitionGroup>
-    </ul>
+      <input
+        v-model.trim="taskName"
+        class="todo-list__add-input"
+        placeholder="What needs to be done?"
+        aria-label="Task name"
+      >
+      <button
+        class="todo-list__add-button"
+        type="submit"
+        aria-label="Add task"
+      >
+        +
+      </button>
+    </form>
+    <section
+      class="todo-list__tasks"
+      aria-label="Todo list"
+    >
+      <ul
+        ref="dragContainer"
+        class="todo-list__items"
+        @pointermove="moveDrag"
+        @pointerup="finishDrag"
+        @pointercancel="finishDrag"
+      >
+        <TransitionGroup name="todo-list">
+          <TodoItem
+            v-for="todo in todos"
+            :key="todo.id"
+            :todo="todo"
+            :placeholder="dragSession?.todoId === todo.id"
+            :actions-open="activeActionsTodoId === todo.id"
+            @toggle-task="toggleTask"
+            @delete-task="deleteTask"
+            @update-name="updateName"
+            @toggle-actions="toggleActions"
+            @close-actions="activeActionsTodoId = null"
+            @drag-start="startDrag"
+          />
+        </TransitionGroup>
+      </ul>
+    </section>
     <TodoItem
       v-if="activeTodo"
       :todo="activeTodo"
       :style="dragOverlayStyle"
       overlay
     />
-    <div class="todo-list__call-to-action">
-      <input
-        v-model.trim="taskName"
-        class="todo-list__new-item"
-        @keyup.enter="addTask"
-      >
-      <button
-        class="todo-list__button"
-        @click="addTask"
-      >
-        +
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import DateTimeHeader from '@/components/DateTimeHeader.vue'
 import TodoItem from '@/components/TodoItem.vue'
 import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
 import { moveItem } from '@/utils/moveItem'
 
 const taskName = ref('')
-
-const title = ref('Todo')
 
 const todos = ref([
   { name: 'function', done: false, id: crypto.randomUUID() },
@@ -63,6 +75,7 @@ const todos = ref([
 ])
 
 const dragSession = ref(null)
+const activeActionsTodoId = ref(null)
 const dragContainer = useTemplateRef('dragContainer')
 
 const activeTodo = computed(() => {
@@ -135,6 +148,25 @@ function toggleTask(id) {
   if (todo) { todo.done = !todo.done }
 }
 
+function toggleActions(id) {
+  activeActionsTodoId.value = activeActionsTodoId.value === id ? null : id
+}
+
+function closeActionsOutside(event) {
+  if (activeActionsTodoId.value === null) { return }
+  if (event.target instanceof Element && event.target.closest('.todo-item__actions')) { return }
+
+  activeActionsTodoId.value = null
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', closeActionsOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', closeActionsOutside)
+})
+
 function deleteTask(id) {
   todos.value = todos.value.filter(todo => id !== todo.id)
 }
@@ -161,77 +193,85 @@ function addTask() {
 </script>
 
 <style>
-.todo-list__wrapper {
+.todo-list {
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: 100vh;
   display: grid;
-  grid-template-areas:
-    'title-list title-list'
-    'todos      todos     '
-    'new-task   submit    ';
-  grid-template-columns: 2fr;
-  grid-template-rows: 160px auto 80px;
-  font-size: 40px;
+  grid-template-rows: auto auto minmax(0, 1fr);
   position: relative;
 }
 
-.todo-list__title {
-  grid-area: title-list;
-  font-family: "Vensfolk";
-  border: none;
-  background: none;
-  color: inherit;
-  display: block;
-  font-size: 3em;
-  width: 100vw;
-  padding: 0;
+.todo-list__header {
+  --header-gutter: clamp(1.25rem, 6vw, 5rem);
+  --header-inset: clamp(1.25rem, 2.1vw, 2rem);
+  min-width: 0;
 }
 
-.todo-list__title:focus {
-  outline: none;
-}
-
-.todo-list__container {
-  grid-area: todos;
+.todo-list__items {
   margin: 0;
-  padding: 30px;
-  overflow: hidden;
-  font-family: "Montserrat";
+  padding: 0;
+  overflow: visible;
+}
+
+.todo-list__tasks {
+  min-width: 0;
+  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
 }
 
 .todo-list-move {
   transition: transform 120ms ease;
 }
 
-.todo-list__call-to-action {
-  grid-area: new-task;
-  display: contents;
-  align-self: end;
+.todo-list__add-form {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1rem, 3vw, 2rem);
+  min-width: 0;
+  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
   box-sizing: border-box;
 }
 
-.todo-list__new-item {
-  grid-area: new-task;
-  width: 100%;
-  background: none;
-  border: none;
-  box-shadow: 0 5px 30px rgba(55, 63, 81, 0.1);
-  background-color: #FAF7F5;
+.todo-list__add-input {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(1.375rem, 2.5vw, 1.5rem);
+  font-family: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #d7d7d7;
+  outline: none;
 }
 
-button.todo-list__button {
+.todo-list__add-input:focus {
+  border-bottom-color: #202020;
+}
+
+.todo-list__add-input::placeholder {
+  color: #d7d7d7;
+}
+
+button.todo-list__add-button {
   all: unset;
-  grid-area: submit;
   display: flex;
   justify-content: center;
-  cursor: pointer;
-  background-color: #FAF7F5;
-  width: 80px;
-  font-size: 60px;
   align-items: center;
+  box-sizing: border-box;
+  width: clamp(3.5rem, 5.3vw, 5rem);
+  height: clamp(3.5rem, 5.3vw, 5rem);
+  cursor: pointer;
+  color: #fff;
+  background: #202020;
+  font-size: 2.5rem;
+  font-weight: 300;
+  border-radius: 6px;
 }
 
-button.todo-list__button:hover {
-  background-color: #FAF7F5;
+button.todo-list__add-button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.25rem;
 }
+
 </style>
