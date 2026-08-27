@@ -245,18 +245,21 @@ function startDrag(event) {
 
 .todo-item__actions-toggle {
   display: grid;
+  place-items: center;
   box-sizing: border-box;
   width: 3rem;
   height: 3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
   font-size: 1.7rem;
   line-height: 1.2;
   color: #d7d7d7;
+  transform: translateY(-0.3em);
 }
 
 button.todo-item__actions-toggle {
-  border: 0;
-  background: transparent;
-  color: #d7d7d7;
   cursor: pointer;
 }
 
