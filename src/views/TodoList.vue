@@ -70,8 +70,11 @@ import { moveItem } from '@/utils/moveItem'
 const taskName = ref('')
 
 const todos = ref([
-  { name: 'function', done: false, id: crypto.randomUUID() },
-  { name: 'take a rest', done: false, id: crypto.randomUUID() }
+  { name: 'Review pull request', done: true, id: crypto.randomUUID() },
+  { name: 'Update project notes', done: false, id: crypto.randomUUID() },
+  { name: 'Book dentist appointment', done: false, id: crypto.randomUUID() },
+  { name: 'Plan weekend trip', done: false, id: crypto.randomUUID() },
+  { name: 'Buy coffee beans', done: false, id: crypto.randomUUID() }
 ])
 
 const dragSession = ref(null)
