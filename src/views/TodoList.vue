@@ -221,6 +221,8 @@ function addTask() {
 
 .todo-list__tasks {
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
   padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
 }
 

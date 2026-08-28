@@ -166,7 +166,7 @@ function startDrag(event) {
   box-sizing: border-box;
   min-height: clamp(3.5rem, 5.3vw, 5rem);
   padding: 0 clamp(1rem, 3vw, 2rem);
-  background: transparent;
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid #d7d7d7;
 }
 
