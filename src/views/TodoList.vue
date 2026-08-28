@@ -201,9 +201,7 @@ function addTask() {
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  height: 100vh;
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 100vh;
   position: relative;
 }
 
@@ -221,8 +219,6 @@ function addTask() {
 
 .todo-list__tasks {
   min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
   padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
 }
 
