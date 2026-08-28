@@ -247,7 +247,7 @@ function addTask() {
 }
 
 .todo-list__add-input:focus {
-  border-bottom-color: #202020;
+  border-bottom-color: #1e1e1e;
 }
 
 .todo-list__add-input::placeholder {
@@ -264,7 +264,7 @@ button.todo-list__add-button {
   height: clamp(3.5rem, 5.3vw, 5rem);
   cursor: pointer;
   color: #fff;
-  background: #202020;
+  background: #1e1e1e;
   font-size: 2.5rem;
   font-weight: 300;
   border-radius: 6px;

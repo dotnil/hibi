@@ -31,6 +31,9 @@
       :aria-label="isCollapsed ? 'Show date and time' : 'Hide date and time'"
       @click="isCollapsed = !isCollapsed"
     >
+      <span class="date-time-header__toggle-label">
+        {{ isCollapsed ? 'Show' : 'Hide' }}
+      </span>
       <span
         class="date-time-header__dot"
         aria-hidden="true"
@@ -133,22 +136,33 @@ onBeforeUnmount(() => {
   position: absolute;
   right: var(--header-gutter);
   bottom: var(--header-inset);
-  display: grid;
-  place-items: center;
-  width: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 4rem;
   height: 2rem;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
+  padding: 0 0.25rem;
+  border: 1px solid transparent;
   background: transparent;
   color: inherit;
   cursor: pointer;
   transform: translate(0.5rem, 0.5rem);
 }
 
+.date-time-header__toggle:hover {
+  border-color: #1e1e1e;
+  border-radius: 20px;
+}
+
 .date-time-header__toggle:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 0.2rem;
+}
+
+.date-time-header__toggle-label {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .date-time-header__dot {
