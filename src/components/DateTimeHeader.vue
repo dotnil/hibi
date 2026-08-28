@@ -151,7 +151,7 @@ onBeforeUnmount(() => {
 }
 
 .date-time-header__toggle:hover {
-  border-color: #1e1e1e;
+  border-color: #cecece;
   border-radius: 20px;
 }
 

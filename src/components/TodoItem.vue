@@ -166,12 +166,10 @@ function startDrag(event) {
   box-sizing: border-box;
   min-height: clamp(3.5rem, 5.3vw, 5rem);
   padding: 0 clamp(1rem, 3vw, 2rem);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid #d7d7d7;
-}
-
-.todo-item + .todo-item {
-  border-top: 0;
+  color: #cecece;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(206, 206, 206, 0.12);
 }
 
 .todo-item--draggable {
@@ -179,11 +177,12 @@ function startDrag(event) {
   touch-action: none;
 }
 
+.todo-item:last-child {
+  border-bottom: 0;
+}
+
 .todo-item--placeholder {
   visibility: hidden;
-}
-.todo-item--placeholder + .todo-item {
-  border-top: 1px solid #d7d7d7;
 }
 .todo-item--overlay {
   position: fixed;
@@ -191,13 +190,12 @@ function startDrag(event) {
   left: 0;
   z-index: 1;
   box-sizing: border-box;
-  border: 1px solid #d7d7d7;
   pointer-events: none;
 }
 
 .todo-item__name--completed {
   text-decoration: line-through;
-  color: #d7d7d7;
+  opacity: 0.42;
 }
 
 .todo-item__name,
@@ -222,14 +220,14 @@ function startDrag(event) {
   width: clamp(1.5rem, 2.5vw, 2rem);
   height: clamp(1.5rem, 2.5vw, 2rem);
   margin: 0;
-  border: 1px solid #d7d7d7;
+  border: 1px solid rgba(206, 206, 206, 0.65);
   background: transparent;
   border-radius: 4px;
 }
 
 .todo-item__checkbox:checked {
   padding: clamp(0.25rem, 0.5vw, 0.35rem);
-  background: #d7d7d7;
+  background: #cecece;
   background-clip: content-box;
   border-radius: 4px;
 }
@@ -255,7 +253,7 @@ function startDrag(event) {
   font-family: inherit;
   font-size: 1.7rem;
   line-height: 1.2;
-  color: #d7d7d7;
+  color: #cecece;
   transform: translateY(-0.3em);
 }
 
