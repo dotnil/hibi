@@ -3,9 +3,9 @@
     ref="element"
     class="todo-item"
     :class="{
-      'todo-item_placeholder': placeholder,
-      'todo-item_overlay': overlay,
-      'todo-item_draggable': !overlay && !editing,
+      'todo-item--placeholder': placeholder,
+      'todo-item--overlay': overlay,
+      'todo-item--draggable': !overlay && !editing,
     }"
     :aria-hidden="overlay || placeholder || undefined"
     :inert="overlay || placeholder"
@@ -33,7 +33,7 @@
     <span
       v-else
       class="todo-item__name"
-      :class="{ 'todo-item__name_completed': todo.done }"
+      :class="{ 'todo-item__name--completed': todo.done }"
     >{{ todo.name }}</span>
     <div
       class="todo-item__actions"
@@ -174,18 +174,18 @@ function startDrag(event) {
   border-top: 0;
 }
 
-.todo-item_draggable {
+.todo-item--draggable {
   cursor: grab;
   touch-action: none;
 }
 
-.todo-item_placeholder {
+.todo-item--placeholder {
   visibility: hidden;
 }
-.todo-item_placeholder + .todo-item {
+.todo-item--placeholder + .todo-item {
   border-top: 1px solid #d7d7d7;
 }
-.todo-item_overlay {
+.todo-item--overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -195,7 +195,7 @@ function startDrag(event) {
   pointer-events: none;
 }
 
-.todo-item__name_completed {
+.todo-item__name--completed {
   text-decoration: line-through;
   color: #d7d7d7;
 }
