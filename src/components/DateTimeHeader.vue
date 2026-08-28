@@ -1,24 +1,41 @@
 <template>
   <time
-    class="date-time-header"
+    :class="[
+      'date-time-header',
+      { 'date-time-header--collapsed': isCollapsed }
+    ]"
     :datetime="dateTime"
   >
-    <span class="date-time-header__date">
+    <span
+      v-show="!isCollapsed"
+      class="date-time-header__date"
+    >
       <span class="date-time-header__day">{{ day }}</span>
       <span class="date-time-header__details">
         <span class="date-time-header__month">{{ month }}</span>
         <span class="date-time-header__weekday">{{ weekday }}</span>
       </span>
     </span>
-    <span class="date-time-header__time">{{ formattedTime }}</span>
+    <span
+      v-show="!isCollapsed"
+      class="date-time-header__time"
+    >{{ formattedTime }}</span>
     <span
       class="date-time-header__dash"
       aria-hidden="true"
     />
-    <span
-      class="date-time-header__dot"
-      aria-hidden="true"
-    />
+    <button
+      class="date-time-header__toggle"
+      type="button"
+      :aria-expanded="!isCollapsed"
+      :aria-label="isCollapsed ? 'Show date and time' : 'Hide date and time'"
+      @click="isCollapsed = !isCollapsed"
+    >
+      <span
+        class="date-time-header__dot"
+        aria-hidden="true"
+      />
+    </button>
   </time>
 </template>
 
@@ -33,6 +50,7 @@ const timeFormatter = new Intl.DateTimeFormat('en-US', {
   hourCycle: 'h23',
 })
 const now = ref(new Date())
+const isCollapsed = ref(false)
 let minuteTimeout
 let minuteInterval
 
@@ -64,6 +82,12 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(0, 1fr) auto;
   min-height: clamp(8rem, calc(3.84rem + 8.66vw), 12rem);
   padding: var(--header-inset) var(--header-gutter);
+  box-sizing: border-box;
+  transition: min-height 180ms ease;
+}
+
+.date-time-header--collapsed {
+  min-height: calc(2 * var(--header-inset) + 1rem);
 }
 
 .date-time-header__date {
@@ -105,14 +129,39 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 
-.date-time-header__dot {
+.date-time-header__toggle {
   position: absolute;
   right: var(--header-gutter);
   bottom: var(--header-inset);
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transform: translate(0.5rem, 0.5rem);
+}
+
+.date-time-header__toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 0.2rem;
+}
+
+.date-time-header__dot {
   width: 1rem;
   aspect-ratio: 1;
   border-radius: 50%;
   background: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .date-time-header {
+    transition: none;
+  }
 }
 
 </style>
