@@ -33,10 +33,10 @@ import TodoList from '@/views/TodoList.vue'
 
 body {
   margin: 0;
-  background-color: #cecece;
+  background-color: #202020;
   background-image: url('./assets/paper-grain.svg');
   background-repeat: repeat;
-  color: #1e1e1e;
+  color: #f2f2f2;
 }
 
 .app {

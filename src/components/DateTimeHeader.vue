@@ -86,6 +86,7 @@ onBeforeUnmount(() => {
   min-height: clamp(8rem, calc(3.84rem + 8.66vw), 12rem);
   padding: var(--header-inset) var(--header-gutter);
   box-sizing: border-box;
+  color: #cecece;
   transition: min-height 180ms ease;
 }
 
