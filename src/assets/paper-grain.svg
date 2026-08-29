@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <filter id="grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.28" numOctaves="2" seed="17" stitchTiles="stitch" result="base-noise" />
+    <feColorMatrix in="base-noise" type="saturate" values="0" result="base-gray" />
+    <feComponentTransfer in="base-gray" result="base-contrast">
+      <feFuncR type="linear" slope="3.7" intercept="-1.45" />
+      <feFuncG type="linear" slope="3.7" intercept="-1.45" />
+      <feFuncB type="linear" slope="3.7" intercept="-1.45" />
+    </feComponentTransfer>
+    <feComponentTransfer in="base-contrast" result="base-tone">
+      <feFuncR type="discrete" tableValues=".110 .114 .118 .125 .133" />
+      <feFuncG type="discrete" tableValues=".110 .114 .118 .125 .133" />
+      <feFuncB type="discrete" tableValues=".110 .114 .118 .125 .133" />
+    </feComponentTransfer>
+
+    <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="1" seed="41" stitchTiles="stitch" result="fine-noise" />
+    <feColorMatrix in="fine-noise" type="saturate" values="0" result="fine-gray" />
+    <feComponentTransfer in="fine-gray" result="fine-contrast">
+      <feFuncR type="linear" slope="3.6" intercept="-1.3" />
+      <feFuncG type="linear" slope="3.6" intercept="-1.3" />
+      <feFuncB type="linear" slope="3.6" intercept="-1.3" />
+    </feComponentTransfer>
+    <feComponentTransfer in="fine-contrast" result="fine-tone">
+      <feFuncR type="discrete" tableValues=".114 .118 .125 .133" />
+      <feFuncG type="discrete" tableValues=".114 .118 .125 .133" />
+      <feFuncB type="discrete" tableValues=".114 .118 .125 .133" />
+    </feComponentTransfer>
+    <feComposite in="base-tone" in2="fine-tone" operator="arithmetic" k2="0.60" k3="0.40" result="paper" />
+
+    <feTurbulence type="fractalNoise" baseFrequency="0.78" numOctaves="1" seed="37" stitchTiles="stitch" result="speckle-noise" />
+    <feColorMatrix in="speckle-noise" type="luminanceToAlpha" result="speckle-alpha" />
+    <feComponentTransfer in="speckle-alpha" result="speckle-mask">
+      <feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 1 1 1" />
+    </feComponentTransfer>
+    <feFlood flood-color="#2a2a2a" result="speckle-color" />
+    <feComposite in="speckle-color" in2="speckle-mask" operator="in" result="speckles" />
+    <feComposite in="speckles" in2="paper" operator="over" />
+  </filter>
+  <rect width="512" height="512" filter="url(#grain)" />
+</svg>

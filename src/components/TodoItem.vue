@@ -3,9 +3,9 @@
     ref="element"
     class="todo-item"
     :class="{
-      'todo-item_placeholder': placeholder,
-      'todo-item_overlay': overlay,
-      'todo-item_draggable': !overlay && !editing,
+      'todo-item--placeholder': placeholder,
+      'todo-item--overlay': overlay,
+      'todo-item--draggable': !overlay && !editing,
     }"
     :aria-hidden="overlay || placeholder || undefined"
     :inert="overlay || placeholder"
@@ -33,7 +33,7 @@
     <span
       v-else
       class="todo-item__name"
-      :class="{ 'todo-item__name_completed': todo.done }"
+      :class="{ 'todo-item__name--completed': todo.done }"
     >{{ todo.name }}</span>
     <div
       class="todo-item__actions"
@@ -166,38 +166,36 @@ function startDrag(event) {
   box-sizing: border-box;
   min-height: clamp(3.5rem, 5.3vw, 5rem);
   padding: 0 clamp(1rem, 3vw, 2rem);
+  color: #cecece;
   background: transparent;
-  border: 1px solid #d7d7d7;
+  border: 0;
+  border-bottom: 1px solid rgba(206, 206, 206, 0.12);
 }
 
-.todo-item + .todo-item {
-  border-top: 0;
-}
-
-.todo-item_draggable {
+.todo-item--draggable {
   cursor: grab;
   touch-action: none;
 }
 
-.todo-item_placeholder {
+.todo-item:last-child {
+  border-bottom: 0;
+}
+
+.todo-item--placeholder {
   visibility: hidden;
 }
-.todo-item_placeholder + .todo-item {
-  border-top: 1px solid #d7d7d7;
-}
-.todo-item_overlay {
+.todo-item--overlay {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1;
   box-sizing: border-box;
-  border: 1px solid #d7d7d7;
   pointer-events: none;
 }
 
-.todo-item__name_completed {
+.todo-item__name--completed {
   text-decoration: line-through;
-  color: #d7d7d7;
+  opacity: 0.1;
 }
 
 .todo-item__name,
@@ -207,7 +205,9 @@ function startDrag(event) {
 }
 
 .todo-item__name {
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   user-select: none;
 }
 
@@ -222,14 +222,14 @@ function startDrag(event) {
   width: clamp(1.5rem, 2.5vw, 2rem);
   height: clamp(1.5rem, 2.5vw, 2rem);
   margin: 0;
-  border: 1px solid #d7d7d7;
+  border: 1px solid rgba(206, 206, 206, 0.65);
   background: transparent;
   border-radius: 4px;
 }
 
 .todo-item__checkbox:checked {
   padding: clamp(0.25rem, 0.5vw, 0.35rem);
-  background: #d7d7d7;
+  background: #cecece;
   background-clip: content-box;
   border-radius: 4px;
 }
@@ -245,18 +245,21 @@ function startDrag(event) {
 
 .todo-item__actions-toggle {
   display: grid;
+  place-items: center;
   box-sizing: border-box;
   width: 3rem;
   height: 3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
   font-size: 1.7rem;
   line-height: 1.2;
-  color: #d7d7d7;
+  color: #cecece;
+  transform: translateY(-0.3em);
 }
 
 button.todo-item__actions-toggle {
-  border: 0;
-  background: transparent;
-  color: #d7d7d7;
   cursor: pointer;
 }
 
@@ -290,6 +293,23 @@ button.todo-item__actions-toggle:focus-visible,
 
 .todo-item__actions-panel button:hover {
   border: 1px solid #d7d7d7;
+}
+
+@media (max-width: 47.999rem) {
+  .todo-item {
+    column-gap: 0.75rem;
+    padding-inline: 0.75rem;
+  }
+
+  .todo-item__name,
+  .todo-item__name-input {
+    font-size: 1.125rem;
+  }
+
+  .todo-item__actions-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 </style>

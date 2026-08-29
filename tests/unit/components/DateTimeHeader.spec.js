@@ -47,3 +47,28 @@ test('Clear timers on unmount', () => {
   header.unmount()
   expect(vi.getTimerCount()).toBe(0)
 })
+
+test('Hide and show the date and time', async () => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date(2026, 7, 6, 14, 24, 42))
+  const header = mount(DateTimeHeader)
+  const toggle = header.get('.date-time-header__toggle')
+
+  expect(toggle.attributes('aria-expanded')).toBe('true')
+  expect(toggle.text()).toBe('Hide')
+
+  await toggle.trigger('click')
+
+  expect(header.classes()).toContain('date-time-header--collapsed')
+  expect(header.get('.date-time-header__date').attributes('style')).toContain('display: none')
+  expect(header.get('.date-time-header__time').attributes('style')).toContain('display: none')
+  expect(toggle.attributes('aria-expanded')).toBe('false')
+  expect(toggle.text()).toBe('Show')
+
+  await toggle.trigger('click')
+
+  expect(header.classes()).not.toContain('date-time-header--collapsed')
+  expect(header.get('.date-time-header__date').attributes('style')).not.toContain('display: none')
+  expect(header.get('.date-time-header__time').attributes('style')).not.toContain('display: none')
+  expect(toggle.text()).toBe('Hide')
+})
