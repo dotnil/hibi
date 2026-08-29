@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import TodoList from '@/views/TodoList.vue'
+import TodoList from '@/pages/TodoList.vue'
 </script>
 
 <style>

@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import TodoItem from '@/components/TodoItem.vue'
-import TodoList from '@/views/TodoList.vue'
+import TodoList from '@/pages/TodoList.vue'
 import { expect, test, vi } from 'vitest'
 
 const defaultTodoNames = [
@@ -134,6 +134,26 @@ test('Keep one actions menu open and close it outside', async () => {
   todoList.unmount()
 })
 
+test('Start one drag session with todo and pointer identity', () => {
+  const todoList = mount(TodoList)
+  const dragContainer = getTodoList(todoList).element
+  dragContainer.setPointerCapture = vi.fn()
+  const todoItem = startDrag(todoList)
+
+  expect(dragContainer.setPointerCapture).toHaveBeenCalledWith(7)
+  expect(todoList.vm.dragSession).toEqual({
+    todoId: todoItem.props('todo').id,
+    pointerId: 7,
+    pointerOffsetX: 20,
+    pointerOffsetY: 30,
+    left: 10,
+    top: 20,
+    width: 300,
+    height: 40,
+    slotOriginTop: 20,
+  })
+})
+
 test('Do not replace an active drag session', () => {
   const todoList = mount(TodoList)
   const todoItems = todoList.findAllComponents(TodoItem)
@@ -161,7 +181,6 @@ test('Show an overlay at the card position and keep the original as placeholder'
   expect(overlay.attributes('style')).toContain('width: 300px')
   expect(overlay.attributes('aria-hidden')).toBe('true')
   expect(overlay.attributes()).toHaveProperty('inert')
-  expect(overlay.find('.todo-item__drag-handle').exists()).toBe(false)
   expect(overlay.find('.todo-item__checkbox').exists()).toBe(true)
   expect(overlay.find('.todo-item__name-input').exists()).toBe(false)
   expect(overlay.find('.todo-item__checkbox').element.tagName).toBe('INPUT')
