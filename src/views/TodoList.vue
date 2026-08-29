@@ -266,6 +266,7 @@ function addTask() {
 
 .todo-list__add-input::placeholder {
   color: #d7d7d7;
+  opacity: 0.1;
 }
 
 button.todo-list__add-button {

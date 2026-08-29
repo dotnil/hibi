@@ -49,10 +49,23 @@ body {
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  max-width: 100%;
+  max-width: 1254px;
+  margin-inline: auto;
   border: 4px solid rgba(206, 206, 206, 0.75);
   color: #1e1e1e;
   box-sizing: border-box;
+}
+
+@media (min-width: 48rem) {
+  #app {
+    min-width: 400px;
+  }
+}
+
+@media (max-width: 47.999rem) {
+  body {
+    padding: 0;
+  }
 }
 
 </style>

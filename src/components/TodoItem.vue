@@ -205,7 +205,9 @@ function startDrag(event) {
 }
 
 .todo-item__name {
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   user-select: none;
 }
 
