@@ -195,7 +195,7 @@ function startDrag(event) {
 
 .todo-item__name--completed {
   text-decoration: line-through;
-  opacity: 0.42;
+  opacity: 0.1;
 }
 
 .todo-item__name,

@@ -201,13 +201,14 @@ function addTask() {
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  min-height: 100vh;
+  flex: 1;
+  min-height: 0;
   position: relative;
 }
 
 .todo-list__header {
-  --header-gutter: clamp(1.25rem, 6vw, 5rem);
-  --header-inset: clamp(1.25rem, 2.1vw, 2rem);
+  --header-gutter: clamp(2.25rem, 8vw, 7rem);
+  --header-inset: clamp(2rem, 4vw, 3.5rem);
   min-width: 0;
 }
 
@@ -219,7 +220,7 @@ function addTask() {
 
 .todo-list__tasks {
   min-width: 0;
-  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(2.25rem, 8vw, 7rem);
 }
 
 .todo-list-move {
@@ -231,8 +232,25 @@ function addTask() {
   align-items: stretch;
   gap: clamp(1rem, 3vw, 2rem);
   min-width: 0;
-  padding: clamp(1.25rem, 2.1vw, 2rem) clamp(1.25rem, 6vw, 5rem);
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(2.25rem, 8vw, 7rem);
   box-sizing: border-box;
+  position: relative;
+}
+
+.todo-list__add-form::after {
+  position: absolute;
+  right: calc(clamp(2.25rem, 8vw, 7rem) - 0.5rem);
+  bottom: clamp(2rem, 4vw, 3.5rem);
+  left: calc(clamp(2.25rem, 8vw, 7rem) - 0.5rem);
+  height: 1px;
+  background: rgba(206, 206, 206, 0.55);
+  content: "";
+  pointer-events: none;
+}
+
+.todo-list__add-form:focus-within::after {
+  height: 2px;
+  background: #cecece;
 }
 
 .todo-list__add-input {
@@ -240,14 +258,10 @@ function addTask() {
   min-width: 0;
   font-size: clamp(1.375rem, 2.5vw, 1.5rem);
   font-family: inherit;
+  color: #cecece;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid #d7d7d7;
   outline: none;
-}
-
-.todo-list__add-input:focus {
-  border-bottom-color: #1e1e1e;
 }
 
 .todo-list__add-input::placeholder {

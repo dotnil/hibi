@@ -1,7 +1,5 @@
 <template>
-  <main class="app">
-    <TodoList />
-  </main>
+  <TodoList />
 </template>
 
 <script setup>
@@ -32,19 +30,27 @@ import TodoList from '@/views/TodoList.vue'
 }
 
 body {
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
+  padding: clamp(2.5rem, 6vw, 5rem);
+  box-sizing: border-box;
+  display: flex;
   background-color: #202020;
   background-image: url('./assets/paper-grain.svg');
   background-repeat: repeat;
   color: #f2f2f2;
 }
 
-.app {
+#app {
   font-family: "Urbanist", "Inter", sans-serif;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   width: 100%;
-  min-width: 20rem;
+  min-width: 0;
   max-width: 100%;
-  min-height: 100vh;
+  border: 4px solid rgba(206, 206, 206, 0.75);
   color: #1e1e1e;
   box-sizing: border-box;
 }

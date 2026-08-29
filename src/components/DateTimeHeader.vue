@@ -84,14 +84,14 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   min-height: clamp(8rem, calc(3.84rem + 8.66vw), 12rem);
-  padding: var(--header-inset) var(--header-gutter);
+  padding: var(--header-inset) var(--header-gutter) 0;
   box-sizing: border-box;
   color: #cecece;
   transition: min-height 180ms ease;
 }
 
 .date-time-header--collapsed {
-  min-height: calc(2 * var(--header-inset) + 1rem);
+  min-height: calc(var(--header-inset) + 1rem);
 }
 
 .date-time-header__date {
@@ -99,6 +99,12 @@ onBeforeUnmount(() => {
   column-gap: clamp(1rem, 2vw, 1.5rem);
   align-self: end;
   min-width: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.date-time-header--collapsed .date-time-header__date {
+  opacity: 0;
+  transform: translateY(-0.5rem);
 }
 
 .date-time-header__dash {
@@ -112,7 +118,7 @@ onBeforeUnmount(() => {
 
 .date-time-header__day {
   font-family: "Libre Bodoni", serif;
-  font-size: clamp(5rem, 10vw, 6.5rem);
+  font-size: clamp(3.75rem, 8vw, 7.5rem);
   font-weight: 400;
   line-height: 0.8;
 }
@@ -131,12 +137,18 @@ onBeforeUnmount(() => {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   font-weight: 600;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.date-time-header--collapsed .date-time-header__time {
+  opacity: 0;
+  transform: translateY(-0.5rem);
 }
 
 .date-time-header__toggle {
   position: absolute;
   right: var(--header-gutter);
-  bottom: var(--header-inset);
+  bottom: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -147,7 +159,20 @@ onBeforeUnmount(() => {
   background: transparent;
   color: inherit;
   cursor: pointer;
-  transform: translate(0.5rem, 0.5rem);
+  transform: translateX(0.5rem);
+}
+
+.date-time-header--collapsed .date-time-header__toggle {
+  top: calc(var(--header-inset) - 0.5rem);
+  bottom: auto;
+}
+
+.date-time-header--collapsed .date-time-header__toggle-label {
+  order: 2;
+}
+
+.date-time-header--collapsed .date-time-header__dot {
+  order: 1;
 }
 
 .date-time-header__toggle:hover {
@@ -175,6 +200,11 @@ onBeforeUnmount(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .date-time-header {
+    transition: none;
+  }
+
+  .date-time-header__date,
+  .date-time-header__time {
     transition: none;
   }
 }
