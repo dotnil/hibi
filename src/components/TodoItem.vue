@@ -295,4 +295,21 @@ button.todo-item__actions-toggle:focus-visible,
   border: 1px solid #d7d7d7;
 }
 
+@media (max-width: 47.999rem) {
+  .todo-item {
+    column-gap: 0.75rem;
+    padding-inline: 0.75rem;
+  }
+
+  .todo-item__name,
+  .todo-item__name-input {
+    font-size: 1.125rem;
+  }
+
+  .todo-item__actions-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
 </style>

@@ -12,6 +12,7 @@
     >
       <span class="date-time-header__day">{{ day }}</span>
       <span class="date-time-header__details">
+        <!-- <span class="date-time-header__name-app">やること To-do</span> -->
         <span class="date-time-header__month">{{ month }}</span>
         <span class="date-time-header__weekday">{{ weekday }}</span>
       </span>
@@ -129,6 +130,11 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
   font-size: clamp(1rem, 2vw, 1.5rem);
   font-weight: 600;
+}
+
+.date-time-header__name-app {
+  font-size: 10px;
+  opacity: 0.15;
 }
 
 .date-time-header__time {
