@@ -124,6 +124,18 @@ test('Emit @dragStart with card geometry from the task name', async () => {
   expect(todoItem.emitted('dragStart')[0][2]).toBe(cardRect)
 })
 
+test('Do not emit drag lifecycle events after drag start', async () => {
+  const todoItem = mountTodoItem()
+
+  await todoItem.trigger('pointermove', { pointerId: 7 })
+  await todoItem.trigger('pointerup', { pointerId: 7 })
+  await todoItem.trigger('pointercancel', { pointerId: 7 })
+
+  expect(todoItem.emitted('dragMove')).toBeUndefined()
+  expect(todoItem.emitted('dragEnd')).toBeUndefined()
+  expect(todoItem.emitted('dragCancel')).toBeUndefined()
+})
+
 test('Do not start drag from task controls', async () => {
   const todoItem = mountTodoItem()
 
@@ -203,6 +215,7 @@ test('Keep the non-interactive card structure in overlay mode', async () => {
 
   expect(todoItem.attributes('aria-hidden')).toBe('true')
   expect(todoItem.attributes()).toHaveProperty('inert')
+  expect(todoItem.find('.todo-item__drag-handle').exists()).toBe(false)
   expect(structuralClasses.map(selector => regularItem.find(selector).exists()))
     .toEqual([true, true, true])
   expect(structuralClasses.map(selector => todoItem.find(selector).exists()))

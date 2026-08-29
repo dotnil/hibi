@@ -1,45 +1,24 @@
 <template>
   <time
-    :class="[
-      'date-time-header',
-      { 'date-time-header--collapsed': isCollapsed }
-    ]"
+    class="date-time-header"
     :datetime="dateTime"
   >
-    <span
-      v-show="!isCollapsed"
-      class="date-time-header__date"
-    >
+    <span class="date-time-header__date">
       <span class="date-time-header__day">{{ day }}</span>
       <span class="date-time-header__details">
-        <!-- <span class="date-time-header__name-app">やること To-do</span> -->
         <span class="date-time-header__month">{{ month }}</span>
         <span class="date-time-header__weekday">{{ weekday }}</span>
       </span>
     </span>
-    <span
-      v-show="!isCollapsed"
-      class="date-time-header__time"
-    >{{ formattedTime }}</span>
+    <span class="date-time-header__time">{{ formattedTime }}</span>
     <span
       class="date-time-header__dash"
       aria-hidden="true"
     />
-    <button
-      class="date-time-header__toggle"
-      type="button"
-      :aria-expanded="!isCollapsed"
-      :aria-label="isCollapsed ? 'Show date and time' : 'Hide date and time'"
-      @click="isCollapsed = !isCollapsed"
-    >
-      <span class="date-time-header__toggle-label">
-        {{ isCollapsed ? 'Show' : 'Hide' }}
-      </span>
-      <span
-        class="date-time-header__dot"
-        aria-hidden="true"
-      />
-    </button>
+    <span
+      class="date-time-header__dot"
+      aria-hidden="true"
+    />
   </time>
 </template>
 
@@ -54,7 +33,6 @@ const timeFormatter = new Intl.DateTimeFormat('en-US', {
   hourCycle: 'h23',
 })
 const now = ref(new Date())
-const isCollapsed = ref(false)
 let minuteTimeout
 let minuteInterval
 
@@ -85,14 +63,7 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   min-height: clamp(8rem, calc(3.84rem + 8.66vw), 12rem);
-  padding: var(--header-inset) var(--header-gutter) 0;
-  box-sizing: border-box;
-  color: #cecece;
-  transition: min-height 180ms ease;
-}
-
-.date-time-header--collapsed {
-  min-height: calc(var(--header-inset) + 1rem);
+  padding: var(--header-inset) var(--header-gutter);
 }
 
 .date-time-header__date {
@@ -100,12 +71,6 @@ onBeforeUnmount(() => {
   column-gap: clamp(1rem, 2vw, 1.5rem);
   align-self: end;
   min-width: 0;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.date-time-header--collapsed .date-time-header__date {
-  opacity: 0;
-  transform: translateY(-0.5rem);
 }
 
 .date-time-header__dash {
@@ -119,7 +84,7 @@ onBeforeUnmount(() => {
 
 .date-time-header__day {
   font-family: "Libre Bodoni", serif;
-  font-size: clamp(3.75rem, 8vw, 7.5rem);
+  font-size: clamp(5rem, 10vw, 6.5rem);
   font-weight: 400;
   line-height: 0.8;
 }
@@ -132,87 +97,22 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 
-.date-time-header__name-app {
-  font-size: 10px;
-  opacity: 0.15;
-}
-
 .date-time-header__time {
   align-self: start;
   font-size: clamp(1.125rem, 2vw, 1.5rem);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   font-weight: 600;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.date-time-header--collapsed .date-time-header__time {
-  opacity: 0;
-  transform: translateY(-0.5rem);
-}
-
-.date-time-header__toggle {
-  position: absolute;
-  right: var(--header-gutter);
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 4rem;
-  height: 2rem;
-  padding: 0 0.25rem;
-  border: 1px solid transparent;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  transform: translateX(0.5rem);
-}
-
-.date-time-header--collapsed .date-time-header__toggle {
-  top: calc(var(--header-inset) - 0.5rem);
-  bottom: auto;
-}
-
-.date-time-header--collapsed .date-time-header__toggle-label {
-  order: 2;
-}
-
-.date-time-header--collapsed .date-time-header__dot {
-  order: 1;
-}
-
-.date-time-header__toggle:hover {
-  border-color: #cecece;
-  border-radius: 20px;
-}
-
-.date-time-header__toggle:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 0.2rem;
-}
-
-.date-time-header__toggle-label {
-  font-family: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
 }
 
 .date-time-header__dot {
+  position: absolute;
+  right: var(--header-gutter);
+  bottom: var(--header-inset);
   width: 1rem;
   aspect-ratio: 1;
   border-radius: 50%;
   background: currentColor;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .date-time-header {
-    transition: none;
-  }
-
-  .date-time-header__date,
-  .date-time-header__time {
-    transition: none;
-  }
 }
 
 </style>
