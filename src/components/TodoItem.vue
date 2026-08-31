@@ -19,17 +19,29 @@
       @pointerdown.stop
       @change="emitToggleTask"
     >
-    <input
-      v-if="editing && !overlay"
-      ref="nameInput"
-      v-model="draftName"
-      class="todo-item__name-input"
-      aria-label="Task name"
-      @pointerdown.stop
-      @blur="cancelEditing"
-      @keyup.enter="saveName"
-      @keyup.esc="cancelEditing"
-    >
+    <template v-if="editing && !overlay">
+      <input
+        ref="nameInput"
+        v-model="draftName"
+        class="todo-item__name-input"
+        aria-label="Task name"
+        :aria-describedby="nameError ? `todo-name-error-${todo.id}` : undefined"
+        :aria-invalid="nameError || undefined"
+        @pointerdown.stop
+        @input="nameError = false"
+        @blur="handleBlur"
+        @keyup.enter="saveName"
+        @keyup.esc="cancelEditing"
+      >
+      <span
+        v-if="nameError"
+        :id="`todo-name-error-${todo.id}`"
+        class="todo-item__name-error"
+        role="alert"
+      >
+        Enter a task name.
+      </span>
+    </template>
     <span
       v-else
       class="todo-item__name"
@@ -104,6 +116,7 @@ const element = useTemplateRef('element')
 const nameInput = useTemplateRef('nameInput')
 const editing = ref(false)
 const draftName = ref('')
+const nameError = ref(false)
 const actionsId = `todo-actions-${props.todo.id}`
 
 function emitToggleTask() {
@@ -130,6 +143,7 @@ async function startEditing() {
 
   emit('closeActions')
   draftName.value = props.todo.name
+  nameError.value = false
   editing.value = true
   await nextTick()
   nameInput.value.focus()
@@ -140,14 +154,33 @@ function saveName() {
 
   const name = draftName.value.trim()
 
-  if (name.length > 0) { emit('updateName', props.todo.id, name) }
+  if (name.length === 0) {
+    nameError.value = true
+    return
+  }
+
+  emit('updateName', props.todo.id, name)
+  nameError.value = false
   editing.value = false
 }
 
 function cancelEditing() {
   if (!editing.value) { return }
 
+  draftName.value = props.todo.name
+  nameError.value = false
   editing.value = false
+}
+
+function handleBlur() {
+  if (!editing.value) { return }
+
+  if (draftName.value.trim().length > 0) {
+    saveName()
+    return
+  }
+
+  cancelEditing()
 }
 
 function startDrag(event) {
@@ -212,8 +245,35 @@ function startDrag(event) {
 }
 
 .todo-item__name-input {
+  appearance: none;
   box-sizing: border-box;
   width: 100%;
+  padding: 0;
+  color: #cecece;
+  font-family: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+}
+
+.todo-item__name-input:focus {
+  box-shadow: inset 0 -1px 0 #cecece;
+}
+
+.todo-item__name-input[aria-invalid="true"] {
+  box-shadow: inset 0 -1px 0 rgb(106, 17, 17);
+}
+
+.todo-item__name-error {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .todo-item__checkbox {

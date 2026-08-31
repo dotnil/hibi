@@ -63,13 +63,12 @@ test('Emit @updateName with the trimmed name on enter', async () => {
   const input = todoItem.find('.todo-item__name-input')
   await input.setValue('  get bread  ')
   await input.trigger('keyup.enter')
-  await input.trigger('blur')
 
   expect(todoItem.emitted('updateName')).toEqual([[todo.id, 'get bread']])
-  expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+  expect(todoItem.find('.todo-item__name-input').exists()).toBe(false)
 })
 
-test('Cancel editing on blur', async () => {
+test('Emit @updateName with the trimmed name on blur', async () => {
   const todoItem = mountTodoItem()
 
   await openActions(todoItem)
@@ -79,8 +78,7 @@ test('Cancel editing on blur', async () => {
   await input.setValue('get bread')
   await input.trigger('blur')
 
-  expect(todoItem.emitted('updateName')).toBeUndefined()
-  expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+  expect(todoItem.emitted('updateName')).toEqual([[todo.id, 'get bread']])
   expect(todoItem.find('.todo-item__name-input').exists()).toBe(false)
 })
 
@@ -109,7 +107,42 @@ test('Do not emit an empty name', async () => {
   await input.trigger('keyup.enter')
 
   expect(todoItem.emitted('updateName')).toBeUndefined()
+  expect(todoItem.find('.todo-item__name-input').exists()).toBe(true)
+  expect(input.attributes('aria-invalid')).toBe('true')
+  const error = todoItem.find(`#todo-name-error-${todo.id}`)
+  expect(input.attributes('aria-describedby')).toBe(error.attributes('id'))
+  expect(error.text()).toBe('Enter a task name.')
+})
+
+test('Clear the invalid state when entering a task name', async () => {
+  const todoItem = mountTodoItem()
+
+  await openActions(todoItem)
+  await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
+  const input = todoItem.find('.todo-item__name-input')
+  await input.setValue('   ')
+  await input.trigger('keyup.enter')
+  await input.setValue('get bread')
+
+  expect(input.attributes('aria-invalid')).toBeUndefined()
+  expect(input.attributes('aria-describedby')).toBeUndefined()
+  expect(todoItem.find(`[id="todo-name-error-${todo.id}"]`).exists()).toBe(false)
+})
+
+test('Cancel editing on an empty blur', async () => {
+  const todoItem = mountTodoItem()
+
+  await openActions(todoItem)
+  await todoItem.find('.todo-item__edit').trigger('click')
+  await todoItem.setProps({ actionsOpen: false })
+  const input = todoItem.find('.todo-item__name-input')
+  await input.setValue('   ')
+  await input.trigger('blur')
+
+  expect(todoItem.emitted('updateName')).toBeUndefined()
   expect(todoItem.find('.todo-item__name').text()).toBe(todo.name)
+  expect(todoItem.find('.todo-item__name-input').exists()).toBe(false)
 })
 
 test('Emit @dragStart with card geometry from the task name', async () => {

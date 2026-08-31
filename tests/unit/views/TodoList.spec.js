@@ -68,6 +68,76 @@ test('Add a new task by submitting the form', async () => {
   await addTask(todoList, 'feed the cat')
 
   expect(todoList.text()).toContain('feed the cat')
+  expect(todoList.find('[role="status"]').text()).toBe('Task added.')
+  expect(todoList.find('[role="status"]').attributes('role')).toBe('status')
+  expect(getAddForm(todoList).find('input').attributes('aria-invalid')).not.toBe('true')
+})
+
+test('Clear the success status when entering the next task', async () => {
+  const todoList = mount(TodoList)
+  const input = getAddForm(todoList).find('input')
+
+  await addTask(todoList, 'feed the cat')
+  await input.setValue('take a walk')
+
+  expect(todoList.find('[role="status"]').text()).toBe('')
+})
+
+test('Clear the task input and keep focus on escape', async () => {
+  const todoList = mount(TodoList, { attachTo: document.body })
+  const input = getAddForm(todoList).find('input')
+
+  await input.setValue('feed the cat')
+  input.element.focus()
+  await input.trigger('keyup.esc')
+
+  expect(input.element.value).toBe('')
+  expect(getTodoItems(todoList)).toHaveLength(defaultTodoNames.length)
+  expect(document.activeElement).toBe(input.element)
+  todoList.unmount()
+})
+
+test('Clear feedback on escape', async () => {
+  const todoList = mount(TodoList)
+  const form = getAddForm(todoList)
+  const input = form.find('input')
+
+  await form.trigger('submit')
+  expect(todoList.find('[role="alert"]').text()).toBe('Enter a task name.')
+  await input.trigger('keyup.esc')
+  expect(todoList.find('[role="alert"]').text()).toBe('')
+
+  await input.setValue('feed the cat')
+  await form.trigger('submit')
+  await input.trigger('keyup.esc')
+  expect(todoList.find('[role="status"]').text()).toBe('')
+})
+
+test('Show an error when submitting an empty task name', async () => {
+  const todoList = mount(TodoList, { attachTo: document.body })
+  const form = getAddForm(todoList)
+  const input = form.find('input')
+
+  await form.trigger('submit')
+
+  expect(getTodoItems(todoList)).toHaveLength(defaultTodoNames.length)
+  expect(todoList.find('#task-name-error').text()).toBe('Enter a task name.')
+  expect(input.attributes('aria-invalid')).toBe('true')
+  expect(input.attributes('aria-describedby')).toBe('task-name-error')
+  expect(document.activeElement).toBe(input.element)
+  todoList.unmount()
+})
+
+test('Clear the task name error when entering a task name', async () => {
+  const todoList = mount(TodoList)
+  const form = getAddForm(todoList)
+  const input = form.find('input')
+
+  await form.trigger('submit')
+  await input.setValue('feed the cat')
+
+  expect(todoList.find('#task-name-error').text()).toBe('')
+  expect(input.attributes('aria-invalid')).not.toBe('true')
 })
 
 test('Complete the task', async () => {
