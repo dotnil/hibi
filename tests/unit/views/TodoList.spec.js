@@ -70,6 +70,31 @@ test('Add a new task by submitting the form', async () => {
   expect(todoList.text()).toContain('feed the cat')
 })
 
+test('Show an error when submitting an empty task name', async () => {
+  const todoList = mount(TodoList)
+  const form = getAddForm(todoList)
+  const input = form.find('input')
+
+  await form.trigger('submit')
+
+  expect(getTodoItems(todoList)).toHaveLength(defaultTodoNames.length)
+  expect(todoList.find('#task-name-error').text()).toBe('Enter a task name.')
+  expect(input.attributes('aria-invalid')).toBe('true')
+  expect(input.attributes('aria-describedby')).toBe('task-name-error')
+})
+
+test('Clear the task name error when entering a task name', async () => {
+  const todoList = mount(TodoList)
+  const form = getAddForm(todoList)
+  const input = form.find('input')
+
+  await form.trigger('submit')
+  await input.setValue('feed the cat')
+
+  expect(todoList.find('#task-name-error').text()).toBe('')
+  expect(input.attributes('aria-invalid')).not.toBe('true')
+})
+
 test('Complete the task', async () => {
   const todoList = mount(TodoList)
   await addTask(todoList, 'feed the cat')

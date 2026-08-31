@@ -14,6 +14,9 @@
         class="todo-list__add-input"
         placeholder="What needs to be done?"
         aria-label="Task name"
+        :aria-describedby="taskNameError ? 'task-name-error' : undefined"
+        :aria-invalid="Boolean(taskNameError)"
+        @input="taskNameError = ''"
       >
       <button
         class="todo-list__add-button"
@@ -23,6 +26,13 @@
         +
       </button>
     </form>
+    <p
+      id="task-name-error"
+      class="todo-list__add-error"
+      role="alert"
+    >
+      {{ taskNameError }}
+    </p>
     <section
       class="todo-list__tasks"
       aria-label="Todo list"
@@ -68,6 +78,7 @@ import { getDragTargetIndex } from '@/utils/getDragTargetIndex'
 import { moveItem } from '@/utils/moveItem'
 
 const taskName = ref('')
+const taskNameError = ref('')
 
 const todos = ref([
   { name: 'Review pull request', done: true, id: crypto.randomUUID() },
@@ -181,7 +192,10 @@ function updateName(id, name) {
 }
 
 function addTask() {
-  if (taskName.value.length === 0) { return }
+  if (taskName.value.length === 0) {
+    taskNameError.value = 'Enter a task name.'
+    return
+  }
 
   const newTask = {
     name: taskName.value,
@@ -191,6 +205,7 @@ function addTask() {
 
   todos.value.push(newTask)
   taskName.value = ''
+  taskNameError.value = ''
 }
 
 </script>
@@ -232,7 +247,7 @@ function addTask() {
   align-items: stretch;
   gap: clamp(1rem, 3vw, 2rem);
   min-width: 0;
-  padding: clamp(2rem, 4vw, 3.5rem) clamp(2.25rem, 8vw, 7rem);
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(2.25rem, 8vw, 7rem) 0;
   box-sizing: border-box;
   position: relative;
 }
@@ -240,7 +255,7 @@ function addTask() {
 .todo-list__add-form::after {
   position: absolute;
   right: calc(clamp(2.25rem, 8vw, 7rem) - 0.5rem);
-  bottom: clamp(2rem, 4vw, 3.5rem);
+  bottom: 0;
   left: calc(clamp(2.25rem, 8vw, 7rem) - 0.5rem);
   height: 1px;
   background: rgba(206, 206, 206, 0.55);
@@ -262,6 +277,15 @@ function addTask() {
   background: transparent;
   border: 0;
   outline: none;
+}
+
+.todo-list__add-error {
+  box-sizing: border-box;
+  min-height: 2rem;
+  margin: 0;
+  padding: 0.75rem clamp(2.25rem, 8vw, 7rem) 0;
+  color: #b42318;
+  font-size: 0.875rem;
 }
 
 .todo-list__add-input::placeholder {
