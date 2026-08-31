@@ -10,13 +10,15 @@
       @submit.prevent="addTask"
     >
       <input
+        ref="addInput"
         v-model.trim="taskName"
         class="todo-list__add-input"
         placeholder="What needs to be done?"
         aria-label="Task name"
         :aria-describedby="taskNameError ? 'task-name-error' : undefined"
         :aria-invalid="Boolean(taskNameError)"
-        @input="taskNameError = ''"
+        @input="taskNameError = ''; taskNameStatus = ''"
+        @keyup.esc="taskName = ''; taskNameError = ''; taskNameStatus = ''"
       >
       <button
         class="todo-list__add-button"
@@ -26,13 +28,21 @@
         +
       </button>
     </form>
-    <p
-      id="task-name-error"
-      class="todo-list__add-error"
-      role="alert"
-    >
-      {{ taskNameError }}
-    </p>
+    <div class="todo-list__add-feedback">
+      <p
+        id="task-name-error"
+        class="todo-list__add-error"
+        role="alert"
+      >
+        {{ taskNameError }}
+      </p>
+      <p
+        class="todo-list__add-status"
+        role="status"
+      >
+        {{ taskNameStatus }}
+      </p>
+    </div>
     <section
       class="todo-list__tasks"
       aria-label="Todo list"
@@ -79,6 +89,7 @@ import { moveItem } from '@/utils/moveItem'
 
 const taskName = ref('')
 const taskNameError = ref('')
+const taskNameStatus = ref('')
 
 const todos = ref([
   { name: 'Review pull request', done: true, id: crypto.randomUUID() },
@@ -90,6 +101,7 @@ const todos = ref([
 
 const dragSession = ref(null)
 const activeActionsTodoId = ref(null)
+const addInput = useTemplateRef('addInput')
 const dragContainer = useTemplateRef('dragContainer')
 
 const activeTodo = computed(() => {
@@ -194,6 +206,8 @@ function updateName(id, name) {
 function addTask() {
   if (taskName.value.length === 0) {
     taskNameError.value = 'Enter a task name.'
+    taskNameStatus.value = ''
+    addInput.value.focus()
     return
   }
 
@@ -206,6 +220,7 @@ function addTask() {
   todos.value.push(newTask)
   taskName.value = ''
   taskNameError.value = ''
+  taskNameStatus.value = 'Task added.'
 }
 
 </script>
@@ -279,13 +294,25 @@ function addTask() {
   outline: none;
 }
 
-.todo-list__add-error {
+.todo-list__add-feedback {
   box-sizing: border-box;
   min-height: 2rem;
   margin: 0;
   padding: 0.75rem clamp(2.25rem, 8vw, 7rem) 0;
-  color: #b42318;
   font-size: 0.875rem;
+}
+
+.todo-list__add-error,
+.todo-list__add-status {
+  margin: 0;
+}
+
+.todo-list__add-error {
+  color: #b42318;
+}
+
+.todo-list__add-status {
+  color: #cecece;
 }
 
 .todo-list__add-input::placeholder {
